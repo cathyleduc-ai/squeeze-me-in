@@ -318,32 +318,102 @@
     dateInput.min = localDate;
     dateInput.value = localDate;
 
-    document.getElementById("searchForm")
-      .addEventListener("submit", function(event) {
-        event.preventDefault();
+    
+const demoAppointments = [
+  {
+    category: "Hair & Beauty",
+    service: "Haircut",
+    business: "Sample Hair Studio",
+    location: "White Rock",
+    daysFromToday: 0,
+    time: "2:00 PM",
+    emoji: "💇"
+  },
+  {
+    category: "Nails & Spa",
+    service: "Manicure",
+    business: "Sample Nail Studio",
+    location: "South Surrey",
+    daysFromToday: 1,
+    time: "11:00 AM",
+    emoji: "💅"
+  },
+  {
+    category: "Massage & Wellness",
+    service: "Massage",
+    business: "Sample Wellness Studio",
+    location: "White Rock",
+    daysFromToday: 1,
+    time: "3:30 PM",
+    emoji: "💆"
+  }
+];
 
-     
-document.getElementById("results").innerHTML = `
-  <h3>Available Appointments 🎉</h3>
-  <div style="text-align:left;line-height:1.8">
-    <p>💇 <strong>Haircut</strong> — Sample Hair Studio<br>
-    White Rock · Today, 2:00 PM<br>
-    <em>Demo listing — not bookable</em></p>
-    <hr>
-    <p>💅 <strong>Manicure</strong> — Sample Nail Studio<br>
-    South Surrey · Tomorrow, 11:00 AM<br>
-    <em>Demo listing — not bookable</em></p>
-    <hr>
-    <p>💆 <strong>Massage</strong> — Sample Wellness Studio<br>
-    White Rock · Tomorrow, 3:30 PM<br>
-    <em>Demo listing — not bookable</em></p>
-  </div>
-`;
-   
+document.getElementById("searchForm")
+  .addEventListener("submit", function(event) {
+    event.preventDefault();
 
-        document.getElementById("openings")
-          .scrollIntoView({ behavior: "smooth" });
-      });
+    const category = document.getElementById("category").value;
+    const selectedDate = document.getElementById("date").value;
+
+    const matches = demoAppointments.filter(function(item) {
+      const appointmentDate = new Date();
+      appointmentDate.setHours(12, 0, 0, 0);
+      appointmentDate.setDate(
+        appointmentDate.getDate() + item.daysFromToday
+      );
+
+      const dateString =
+        appointmentDate.getFullYear() + "-" +
+        String(appointmentDate.getMonth() + 1).padStart(2, "0") + "-" +
+        String(appointmentDate.getDate()).padStart(2, "0");
+
+      return (!category || item.category === category) &&
+             (!selectedDate || dateString === selectedDate);
+    });
+
+    const results = document.getElementById("results");
+    results.replaceChildren();
+
+    const heading = document.createElement("h3");
+    heading.textContent = "Available Appointments 🎉";
+    results.appendChild(heading);
+
+    if (matches.length === 0) {
+      const message = document.createElement("p");
+      message.textContent =
+        "No sample appointments match your search. Try another category or date.";
+      results.appendChild(message);
+    }
+
+    matches.forEach(function(item) {
+      const card = document.createElement("div");
+      card.style.cssText =
+        "text-align:left;padding:14px 0;border-bottom:1px solid #ddd;";
+
+      const name = document.createElement("p");
+      const strong = document.createElement("strong");
+      strong.textContent = item.emoji + " " + item.service;
+      name.appendChild(strong);
+      name.appendChild(document.createTextNode(" — " + item.business));
+
+      const details = document.createElement("p");
+      details.textContent =
+        item.location + " · " +
+        (item.daysFromToday === 0 ? "Today" : "Tomorrow") +
+        ", " + item.time;
+
+      const note = document.createElement("em");
+      note.textContent = "Demo listing — not bookable";
+
+      card.append(name, details, note);
+      results.appendChild(card);
+    });
+
+    document.getElementById("openings")
+      .scrollIntoView({ behavior: "smooth" });
+  });
+
 
     document.getElementById("businessButton")
       .addEventListener("click", function() {
