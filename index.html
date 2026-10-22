@@ -322,10 +322,24 @@
       .addEventListener("submit", function(event) {
         event.preventDefault();
 
-        document.getElementById("results").innerHTML =
-          "<h3>We're getting ready! 🎉</h3>" +
-          "<p>Live appointment searching will be " +
-          "available when local businesses join.</p>";
+     
+document.getElementById("results").innerHTML = `
+  <h3>Available Appointments 🎉</h3>
+  <div style="text-align:left;line-height:1.8">
+    <p>💇 <strong>Haircut</strong> — Sample Hair Studio<br>
+    White Rock · Today, 2:00 PM<br>
+    <em>Demo listing — not bookable</em></p>
+    <hr>
+    <p>💅 <strong>Manicure</strong> — Sample Nail Studio<br>
+    South Surrey · Tomorrow, 11:00 AM<br>
+    <em>Demo listing — not bookable</em></p>
+    <hr>
+    <p>💆 <strong>Massage</strong> — Sample Wellness Studio<br>
+    White Rock · Tomorrow, 3:30 PM<br>
+    <em>Demo listing — not bookable</em></p>
+  </div>
+`;
+   
 
         document.getElementById("openings")
           .scrollIntoView({ behavior: "smooth" });
