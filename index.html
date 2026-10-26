@@ -417,7 +417,7 @@ function distanceKm(lat1, lon1, lat2, lon2) {
   };
 }
 document.getElementById("searchForm")
-  .addEventListener("submit", function(event) {
+  .addEventListener("submit", async function(event) {
     event.preventDefault();
 
     const category = document.getElementById("category").value;
