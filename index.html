@@ -452,8 +452,22 @@ if (searchLocation) {
         String(appointmentDate.getMonth() + 1).padStart(2, "0") + "-" +
         String(appointmentDate.getDate()).padStart(2, "0");
 
-      return (!category || item.category === category) &&
-             (!selectedDate || dateString === selectedDate);
+      const matchesCategory = !category || item.category === category;
+const matchesDate = !selectedDate || dateString === selectedDate;
+
+const matchesDistance = !customerCoordinates ||
+  (
+    Number.isFinite(item.latitude) &&
+    Number.isFinite(item.longitude) &&
+    distanceKm(
+      customerCoordinates.latitude,
+      customerCoordinates.longitude,
+      item.latitude,
+      item.longitude
+    ) <= searchRadius
+  );
+
+return matchesCategory && matchesDate && matchesDistance;
     });
 
     const results = document.getElementById("results");
