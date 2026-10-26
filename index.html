@@ -381,6 +381,14 @@ function distanceKm(lat1, lon1, lat2, lon2) {
   return earthRadiusKm * 2 *
     Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+    async function lookupLocation(searchText) {
+  if (!searchText.trim()) {
+    return null;
+  }
+
+  // Geoapify connection will go here.
+  return null;
+}
 document.getElementById("searchForm")
   .addEventListener("submit", function(event) {
     event.preventDefault();
