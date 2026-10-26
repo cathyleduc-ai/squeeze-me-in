@@ -387,7 +387,8 @@ document.getElementById("searchForm")
 
     const category = document.getElementById("category").value;
     const selectedDate = document.getElementById("date").value;
-
+const searchLocation = document.getElementById("location").value.trim();
+const searchRadius = Number(document.getElementById("radius").value);
     const matches = demoAppointments.filter(function(item) {
       const appointmentDate = new Date();
       appointmentDate.setHours(12, 0, 0, 0);
