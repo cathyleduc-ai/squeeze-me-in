@@ -386,8 +386,35 @@ function distanceKm(lat1, lon1, lat2, lon2) {
     return null;
   }
 
-  // Geoapify connection will go here.
-  return null;
+  const apiKey = "";
+
+  if (!apiKey) {
+    return null;
+  }
+
+  const url = new URL("https://api.geoapify.com/v1/geocode/search");
+  url.searchParams.set("text", searchText + ", Canada");
+  url.searchParams.set("filter", "countrycode:ca");
+  url.searchParams.set("limit", "1");
+  url.searchParams.set("apiKey", apiKey);
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Location lookup failed");
+  }
+
+  const data = await response.json();
+  const place = data.features?.[0]?.properties;
+
+  if (!place) {
+    return null;
+  }
+
+  return {
+    latitude: place.lat,
+    longitude: place.lon
+  };
 }
 document.getElementById("searchForm")
   .addEventListener("submit", function(event) {
