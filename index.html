@@ -424,6 +424,22 @@ document.getElementById("searchForm")
     const selectedDate = document.getElementById("date").value;
 const searchLocation = document.getElementById("location").value.trim();
 const searchRadius = Number(document.getElementById("radius").value);
+    let customerCoordinates = null;
+
+if (searchLocation) {
+  try {
+    customerCoordinates = await lookupLocation(searchLocation);
+
+    if (!customerCoordinates) {
+      alert("We couldn't find that location. Please try a Canadian city or postal code.");
+      return;
+    }
+  } catch (error) {
+    console.error("Location lookup error:", error);
+    alert("Location search is temporarily unavailable. Please try again.");
+    return;
+  }
+}
     const matches = demoAppointments.filter(function(item) {
       const appointmentDate = new Date();
       appointmentDate.setHours(12, 0, 0, 0);
