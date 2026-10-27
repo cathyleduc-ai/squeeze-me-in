@@ -440,12 +440,8 @@ if (searchLocation) {
     return;
   }
 }
-    const matches = demoAppointments.filter(function(item) {
-      const appointmentDate = new Date();
-      appointmentDate.setHours(12, 0, 0, 0);
-      appointmentDate.setDate(
-        appointmentDate.getDate() + item.daysFromToday
-      );
+   const matches = (window.realAppointments || []).filter(item => {
+      const appointmentDate = new Date(item.appointment_at);
 
       const dateString =
         appointmentDate.getFullYear() + "-" +
@@ -467,12 +463,15 @@ const matchesDistance = !customerCoordinates ||
     ) <= searchRadius
   );
 
-return matchesCategory && matchesDate && matchesDistance;
+const matchesDistance =
+  !searchLocation ||
+  item.location?.toLowerCase().trim() ===
+    searchLocation.toLowerCase().trim();
     });
 
     const results = document.getElementById("results");
     results.replaceChildren();
-
+const realAppointments = window.realAppointments || [];
     const heading = document.createElement("h3");
     heading.textContent = "Available Appointments 🎉";
     results.appendChild(heading);
@@ -491,20 +490,43 @@ return matchesCategory && matchesDate && matchesDistance;
 
       const name = document.createElement("p");
       const strong = document.createElement("strong");
-      strong.textContent = item.emoji + " " + item.service;
+      strong.textContent = item.service_name;
       name.appendChild(strong);
       name.appendChild(document.createTextNode(" — " + item.business));
 
       const details = document.createElement("p");
       details.textContent =
-        item.location + " · " +
-        (item.daysFromToday === 0 ? "Today" : "Tomorrow") +
-        ", " + item.time;
+  item.location + " · " +
+  new Date(item.appointment_at).toLocaleString("en-CA", {
+    timeZone: "America/Vancouver",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  });
 
       const note = document.createElement("em");
-      note.textContent = "Demo listing — not bookable";
+      note.textContent = "Contact the business to book this opening";
+const bookingLink = document.createElement("a");
 
+if (item.booking_url) {
+  bookingLink.href = item.booking_url;
+  bookingLink.textContent = "Book Now";
+  bookingLink.target = "_blank";
+  bookingLink.rel = "noopener noreferrer";
+} else if (item.phone) {
+  bookingLink.href = "tel:" + item.phone;
+  bookingLink.textContent = "Call to Book";
+}
+
+if (bookingLink.href) {
+  bookingLink.style.cssText =
+    "display:inline-block;margin-top:10px;color:#00B3B8;font-weight:bold;";
+  
+}
       card.append(name, details, note);
+      if (bookingLink.href) card.appendChild(bookingLink);
       results.appendChild(card);
     });
 
@@ -529,7 +551,7 @@ return matchesCategory && matchesDate && matchesDistance;
   async function loadRealOpenings() {
   const { data, error } = await supabaseClient
     .from("appointment_openings")
-    .select("id, business_id, service_name, appointment_at, expires_at, status, booking_url, phone, businesses(business_name, category, city, latitude, longitude)")
+    .select("id, business_id, service_name, appointment_at, expires_at, status, booking_url, phone")
     .eq("status", "available")
     .gt("appointment_at", new Date().toISOString())
 .gt("expires_at", new Date().toISOString());
@@ -538,8 +560,35 @@ return matchesCategory && matchesDate && matchesDistance;
     console.error("Error loading openings:", error);
     return;
   }
+const { data: directory, error: directoryError } =
+  await supabaseClient
+    .from("business_directory")
+    .select("business_id, business_name, category, city, postal_code, phone, booking_url");
 
+if (directoryError) {
+  console.error("Error loading business directory:", directoryError);
+  return;
+}
   console.log("Real appointment openings:", data);
+    window.realAppointments = (data || [])
+  .map(item => {
+    const business = (directory || []).find(
+      entry => entry.business_id === item.business_id
+    );
+
+    if (!business) return null;
+
+    return {
+      ...item,
+      business: business.business_name,
+      category: business.category,
+      location: business.city,
+      postal_code: business.postal_code,
+      booking_url: item.booking_url || business.booking_url,
+      phone: item.phone || business.phone
+    };
+  })
+  .filter(Boolean);
 }
 
 loadRealOpenings();
