@@ -129,7 +129,28 @@ button:disabled { opacity: .6; }
         <span id="bookingUrl"></span>
       </p>
     </div>
+<div class="card">
+  <h2>Edit Business Information</h2>
 
+  <form id="businessEditForm">
+    <label for="editBusinessName">Business name</label>
+    <input id="editBusinessName" required maxlength="120">
+
+    <label for="editCity">City</label>
+    <input id="editCity" placeholder="e.g. White Rock">
+
+    <label for="editPhone">Business phone</label>
+    <input id="editPhone" type="tel">
+
+    <label for="editBookingUrl">Booking website</label>
+    <input id="editBookingUrl" type="url"
+      placeholder="https://yourbookingwebsite.com">
+
+    <button type="submit">Save Business Information</button>
+  </form>
+
+  <p id="editMessage" role="status"></p>
+</div>
     <div class="card">
       <h2>Appointment Openings</h2>
       <p>
@@ -256,7 +277,86 @@ document.getElementById("loginForm")
 
     await loadDashboard();
   });
+// Fill the business edit form with saved information
+async function fillBusinessEditForm() {
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) return;
 
+  const { data: profile, error } = await client
+    .from("business_profiles")
+    .select("business_name,city,phone,booking_url")
+    .eq("owner_id", user.id)
+    .single();
+
+  if (error || !profile) return;
+
+  document.getElementById("editBusinessName").value =
+    profile.business_name || "";
+  document.getElementById("editCity").value =
+    profile.city || "";
+  document.getElementById("editPhone").value =
+    profile.phone || "";
+  document.getElementById("editBookingUrl").value =
+    profile.booking_url || "";
+}
+
+// Save changes to Supabase
+document.getElementById("businessEditForm")
+  .addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const editMessage = document.getElementById("editMessage");
+    const saveButton = this.querySelector('button[type="submit"]');
+
+    saveButton.disabled = true;
+    editMessage.textContent = "Saving your information...";
+
+    try {
+      const { data: { user }, error: authError } =
+        await client.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error("Please sign in again.");
+      }
+
+      const { error } = await client
+        .from("business_profiles")
+        .update({
+          business_name:
+            document.getElementById("editBusinessName").value.trim(),
+          city:
+            document.getElementById("editCity").value.trim() || null,
+          phone:
+            document.getElementById("editPhone").value.trim() || null,
+          booking_url:
+            document.getElementById("editBookingUrl").value.trim() || null
+        })
+        .eq("owner_id", user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      editMessage.textContent = "Business information saved successfully!";
+      await loadDashboard();
+
+    } catch (error) {
+      editMessage.textContent = "Save error: " + error.message;
+    } finally {
+      saveButton.disabled = false;
+    }
+  });
+
+// Populate the form after the dashboard loads
+const originalLoadDashboard = loadDashboard;
+
+loadDashboard = async function() {
+  await originalLoadDashboard();
+
+  if (!dashboardSection.classList.contains("hidden")) {
+    await fillBusinessEditForm();
+  }
+};
 document.getElementById("signOutButton")
   .addEventListener("click", async function() {
     await client.auth.signOut();
