@@ -526,6 +526,22 @@ return matchesCategory && matchesDate && matchesDistance;
     "sb_publishable_brnqWUHE-F7TUx-6OcLgzw_Mk-aFOFy"
   );
 
+  async function loadRealOpenings() {
+  const { data, error } = await supabaseClient
+    .from("appointment_openings")
+    .select("id, service_name, appointment_at, status")
+    .eq("status", "available")
+    .gt("appointment_at", new Date().toISOString());
+
+  if (error) {
+    console.error("Error loading openings:", error);
+    return;
+  }
+
+  console.log("Real appointment openings:", data);
+}
+
+loadRealOpenings();
   console.log("Squeeze Me In: Supabase connected");
 </script>
 
