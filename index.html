@@ -451,17 +451,23 @@ if (searchLocation) {
       const matchesCategory = !category || item.category === category;
 const matchesDate = !selectedDate || dateString === selectedDate;
 
-const matchesDistance = !customerCoordinates ||
+const matchesDistance = !customerCoordinates || (
+  Number.isFinite(item.latitude) &&
+  Number.isFinite(item.longitude) &&
+  distanceKm(
+    customerCoordinates.latitude,
+    customerCoordinates.longitude,
+    item.latitude,
+    item.longitude
+  ) <= searchRadius
+) || (
+  searchLocation &&
   (
-    Number.isFinite(item.latitude) &&
-    Number.isFinite(item.longitude) &&
-    distanceKm(
-      customerCoordinates.latitude,
-      customerCoordinates.longitude,
-      item.latitude,
-      item.longitude
-    ) <= searchRadius
-  );
+    item.location?.toLowerCase() === searchLocation.toLowerCase() ||
+    item.postal_code?.replace(/\s/g, "").toLowerCase() ===
+      searchLocation.replace(/\s/g, "").toLowerCase()
+  )
+);
 
      
      return matchesCategory && matchesDate && matchesDistance;
