@@ -529,7 +529,7 @@ return matchesCategory && matchesDate && matchesDistance;
   async function loadRealOpenings() {
   const { data, error } = await supabaseClient
     .from("appointment_openings")
-    .select("id, service_name, appointment_at, status")
+    .select("id, business_id, service_name, appointment_at, expires_at, status, booking_url, phone")
     .eq("status", "available")
     .gt("appointment_at", new Date().toISOString());
 
