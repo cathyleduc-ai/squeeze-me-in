@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Dashboard | Squeeze Me In</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #EAF9F8;
+  color: #1F2937;
+}
+header {
+  background: white;
+  padding: 22px;
+  text-align: center;
+  border-bottom: 3px solid #00B3B8;
+}
+header a {
+  color: #00B3B8;
+  text-decoration: none;
+  font-size: 28px;
+  font-weight: bold;
+}
+main {
+  max-width: 650px;
+  margin: 30px auto;
+  padding: 24px;
+}
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px #00000010;
+}
+h1 { font-size: 27px; }
+h2 { font-size: 21px; }
+label {
+  display: block;
+  font-weight: bold;
+  margin: 14px 0 6px;
+}
+input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+button {
+  background: #FF7A00;
+  color: white;
+  border: 0;
+  border-radius: 9px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 16px;
+}
+button:disabled { opacity: .6; }
+.secondary { background: #00B3B8; }
+.hidden { display: none; }
+.status {
+  background: #FFF5E8;
+  padding: 15px;
+  border-radius: 9px;
+}
+#message { line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/">Squeeze Me In</a>
+</header>
+
+<main>
+  <h1>Business Dashboard</h1>
+
+  <p id="message" role="status">
+    Checking your account...
+  </p>
+
+  <section id="loginSection" class="card hidden">
+    <h2>Business Login</h2>
+    <form id="loginForm">
+      <label for="email">Business email</label>
+      <input id="email" type="email" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password" required>
+
+      <button type="submit">Sign In</button>
+    </form>
+    <p>
+      New business?
+      <a href="/business-signup.html">Create an account</a>
+    </p>
+  </section>
+
+  <section id="dashboardSection" class="hidden">
+
+    <div class="card">
+      <h2 id="welcome">Welcome!</h2>
+      <p id="businessEmail"></p>
+      <div class="status">
+        <strong>Account status:</strong>
+        <span id="accountStatus"></span>
+      </div>
+      <p id="trialMessage"></p>
+    </div>
+
+    <div class="card">
+      <h2>Business Information</h2>
+      <p><strong>Business name:</strong>
+        <span id="businessName"></span>
+      </p>
+      <p><strong>City:</strong>
+        <span id="businessCity"></span>
+      </p>
+      <p><strong>Phone:</strong>
+        <span id="businessPhone"></span>
+      </p>
+      <p><strong>Booking website:</strong>
+        <span id="bookingUrl"></span>
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Appointment Openings</h2>
+      <p>
+        Soon you'll be able to post last-minute
+        appointment openings here.
+      </p>
+      <button disabled>
+        Post an Opening — Coming Soon
+      </button>
+    </div>
+
+    <button id="signOutButton" class="secondary">
+      Sign Out
+    </button>
+
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const client = window.supabase.createClient(
+  "https://zhgieqcdirxywwbyprlo.supabase.co",
+  "sb_publishable_brnqWUHE-F7TUx-6OcLgzw_Mk-aFOFy"
+);
+
+const message = document.getElementById("message");
+const loginSection = document.getElementById("loginSection");
+const dashboardSection =
+  document.getElementById("dashboardSection");
+
+function showLogin(text) {
+  loginSection.classList.remove("hidden");
+  dashboardSection.classList.add("hidden");
+  message.textContent = text || "Please sign in.";
+}
+
+async function loadDashboard() {
+  const { data: userData, error: userError } =
+    await client.auth.getUser();
+
+  if (userError || !userData.user) {
+    showLogin("Please sign in to your business account.");
+    return;
+  }
+
+  const user = userData.user;
+
+  const { data: profile, error } = await client
+    .from("business_profiles")
+    .select(
+      "business_name,email,city,phone,booking_url,status,trial_ends_at"
+    )
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    message.textContent =
+      "Could not load business profile: " + error.message;
+    return;
+  }
+
+  if (!profile) {
+    message.textContent =
+      "No business profile found. Please contact support.";
+    return;
+  }
+
+  loginSection.classList.add("hidden");
+  dashboardSection.classList.remove("hidden");
+  message.textContent = "";
+
+  document.getElementById("welcome").textContent =
+    "Welcome, " + profile.business_name + "!";
+
+  document.getElementById("businessEmail").textContent =
+    profile.email;
+
+  document.getElementById("accountStatus").textContent =
+    profile.status === "approved"
+      ? "Approved"
+      : profile.status === "rejected"
+      ? "Not approved"
+      : "Pending Approval";
+
+  document.getElementById("businessName").textContent =
+    profile.business_name;
+
+  document.getElementById("businessCity").textContent =
+    profile.city || "Not added yet";
+
+  document.getElementById("businessPhone").textContent =
+    profile.phone || "Not added yet";
+
+  document.getElementById("bookingUrl").textContent =
+    profile.booking_url || "Not added yet";
+
+  document.getElementById("trialMessage").textContent =
+    profile.trial_ends_at
+      ? "Free trial ends: " +
+        new Date(profile.trial_ends_at).toLocaleDateString()
+      : "Your free trial has not started yet.";
+}
+
+document.getElementById("loginForm")
+  .addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    message.textContent = "Signing in...";
+
+    const email = document.getElementById("email").value;
+    const password =
+      document.getElementById("password").value;
+
+    const { error } =
+      await client.auth.signInWithPassword({
+        email,
+        password
+      });
+
+    if (error) {
+      showLogin("Sign-in error: " + error.message);
+      return;
+    }
+
+    await loadDashboard();
+  });
+
+document.getElementById("signOutButton")
+  .addEventListener("click", async function() {
+    await client.auth.signOut();
+    showLogin("You have signed out.");
+  });
+
+loadDashboard();
+</script>
+
+</body>
+</html>
