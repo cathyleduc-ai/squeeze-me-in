@@ -463,10 +463,8 @@ const matchesDistance = !customerCoordinates ||
     ) <= searchRadius
   );
 
-const matchesDistance =
-  !searchLocation ||
-  item.location?.toLowerCase().trim() ===
-    searchLocation.toLowerCase().trim();
+     
+     return matchesCategory && matchesDate && matchesDistance;
     });
 
     const results = document.getElementById("results");
