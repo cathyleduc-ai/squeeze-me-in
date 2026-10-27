@@ -419,7 +419,7 @@ function distanceKm(lat1, lon1, lat2, lon2) {
 document.getElementById("searchForm")
   .addEventListener("submit", async function(event) {
     event.preventDefault();
-
+if (window.openingsReady) await window.openingsReady;
     const category = document.getElementById("category").value;
     const selectedDate = document.getElementById("date").value;
 const searchLocation = document.getElementById("location").value.trim();
@@ -589,7 +589,7 @@ if (directoryError) {
   .filter(Boolean);
 }
 
-loadRealOpenings();
+window.openingsReady = loadRealOpenings();
   console.log("Squeeze Me In: Supabase connected");
 </script>
 
