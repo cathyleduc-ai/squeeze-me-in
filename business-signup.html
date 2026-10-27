@@ -108,14 +108,56 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Supabase connection will be added next.
-    // This form is not yet accepting registrations.
-    document.getElementById("signupForm")
-      .addEventListener("submit", function(event) {
-        event.preventDefault();
-        document.getElementById("message").textContent =
-          "Registration is being set up. Please check back soon.";
+  const supabaseClient = window.supabase.createClient(
+    "https://zhgieqcdirxywwbyprlo.supabase.co",
+    "sb_publishable_brnqWUHE-F7TUx-6OcLgzw_Mk-aFOFy"
+  );
+
+  const signupForm = document.getElementById("signupForm");
+  const signupButton = document.getElementById("signupButton");
+  const message = document.getElementById("message");
+
+  signupForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const businessName =
+      document.getElementById("businessName").value.trim();
+    const email =
+      document.getElementById("email").value.trim();
+    const password =
+      document.getElementById("password").value;
+
+    signupButton.disabled = true;
+    message.textContent = "Creating your business account...";
+
+    try {
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo:
+            "https://www.squeezemein.ca/business-signup.html",
+          data: {
+            business_name: businessName
+          }
+        }
       });
-  </script>
+
+      if (error) throw error;
+
+      message.textContent =
+        "Please check your email for a confirmation link. " +
+        "Your business account registration has been submitted.";
+
+      signupForm.reset();
+
+    } catch (error) {
+      message.textContent =
+        "Registration error: " + error.message;
+    } finally {
+      signupButton.disabled = false;
+    }
+  });
+</script>
 </body>
 </html>
