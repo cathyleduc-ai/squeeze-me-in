@@ -531,7 +531,8 @@ return matchesCategory && matchesDate && matchesDistance;
     .from("appointment_openings")
     .select("id, business_id, service_name, appointment_at, expires_at, status, booking_url, phone, businesses(business_name, category, city, latitude, longitude)")
     .eq("status", "available")
-    .gt("appointment_at", new Date().toISOString());
+    .gt("appointment_at", new Date().toISOString())
+.gt("expires_at", new Date().toISOString());
 
   if (error) {
     console.error("Error loading openings:", error);
