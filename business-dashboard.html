@@ -457,6 +457,89 @@ document.getElementById("signOutButton")
     showLogin("You have signed out.");
   });
 
+async function loadMyOpenings() {
+  const container = document.getElementById("myOpenings");
+  if (!container) return;
+
+  container.textContent = "Loading your appointments...";
+
+  const { data: { user }, error: userError } =
+    await client.auth.getUser();
+
+  if (userError || !user) {
+    container.textContent = "Please sign in.";
+    return;
+  }
+
+  const { data: business, error: businessError } = await client
+    .from("businesses")
+    .select("id")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (businessError || !business) {
+    container.textContent = "No business record found.";
+    return;
+  }
+
+  const { data: openings, error } = await client
+    .from("appointment_openings")
+    .select("service_name,appointment_at,status,description")
+    .eq("business_id", business.id)
+    .order("appointment_at", { ascending: true });
+
+  if (error) {
+    container.textContent = "Unable to load appointments: " + error.message;
+    return;
+  }
+
+  if (!openings || openings.length === 0) {
+    container.textContent = "You have no saved appointments yet.";
+    return;
+  }
+
+  container.replaceChildren();
+
+  openings.forEach(opening => {
+    const card = document.createElement("div");
+    card.style.cssText =
+      "border:1px solid #ddd;border-radius:10px;padding:15px;margin:12px 0;";
+
+    const name = document.createElement("strong");
+    name.textContent = opening.service_name;
+
+    const details = document.createElement("p");
+    details.textContent =
+      new Date(opening.appointment_at).toLocaleString("en-CA", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+
+    const status = document.createElement("p");
+    status.textContent = "Status: " + opening.status;
+
+    card.append(name, details, status);
+
+    if (opening.description) {
+      const description = document.createElement("p");
+      description.textContent = opening.description;
+      card.append(description);
+    }
+
+    container.append(card);
+  });
+}
+
+const previousLoadDashboard = loadDashboard;
+
+loadDashboard = async function() {
+  await previousLoadDashboard();
+
+  if (!dashboardSection.classList.contains("hidden")) {
+    await loadMyOpenings();
+  }
+};
+
 loadDashboard();
 </script>
 
