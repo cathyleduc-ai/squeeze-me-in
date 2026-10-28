@@ -217,7 +217,10 @@ async function loadDashboard() {
       "No business profile found. Please contact support.";
     return;
   }
-
+if (profile.status !== "approved") {
+  showLogin("Your business account is pending approval. You will be able to access your dashboard once approved.");
+  return;
+}
   loginSection.classList.add("hidden");
   dashboardSection.classList.remove("hidden");
   message.textContent = "";
