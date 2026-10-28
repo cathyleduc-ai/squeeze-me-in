@@ -484,7 +484,7 @@ async function loadMyOpenings() {
 
   const { data: openings, error } = await client
     .from("appointment_openings")
-    .select("service_name,appointment_at,status,description")
+    .select("id,service_name,appointment_at,status,description")
     .eq("business_id", business.id)
     .order("appointment_at", { ascending: true });
 
