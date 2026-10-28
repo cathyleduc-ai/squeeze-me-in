@@ -154,13 +154,24 @@ button:disabled { opacity: .6; }
 </div>
     <div class="card">
       <h2>Appointment Openings</h2>
-      <p>
-        Soon you'll be able to post last-minute
-        appointment openings here.
-      </p>
-      <button disabled>
-        Post an Opening — Coming Soon
-      </button>
+      
+<form id="openingForm">
+  <label for="serviceName">Service or appointment</label>
+  <input id="serviceName" type="text"
+         placeholder="e.g. Haircut, Massage, Dental Cleaning"
+         required maxlength="120">
+
+  <label for="appointmentDate">Appointment date and time</label>
+  <input id="appointmentDate" type="datetime-local" required>
+
+  <label for="openingDescription">Description (optional)</label>
+  <textarea id="openingDescription"
+            placeholder="Additional appointment details"></textarea>
+
+  <button type="submit">Save Opening as Draft</button>
+</form>
+<p id="openingMessage" role="status"></p>
+
     </div>
 
     <button id="signOutButton" class="secondary">
