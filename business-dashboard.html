@@ -269,6 +269,79 @@ if (profile.status !== "approved") {
       : "Your free trial has not started yet.";
 }
 
+document.getElementById("openingForm")
+  .addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const output = document.getElementById("openingMessage");
+    output.textContent = "Saving your opening...";
+
+    try {
+      const { data: { user }, error: userError } =
+        await client.auth.getUser();
+
+      if (userError || !user) {
+        throw new Error("Please sign in again.");
+      }
+
+      const { data: profile, error: profileError } = await client
+        .from("business_profiles")
+        .select("status")
+        .eq("owner_id", user.id)
+        .single();
+
+      if (profileError || profile?.status !== "approved") {
+        throw new Error("Your business must be approved first.");
+      }
+
+      const { data: business, error: businessError } = await client
+        .from("businesses")
+        .select("id")
+        .eq("owner_id", user.id)
+        .single();
+
+      if (businessError || !business) {
+        throw new Error("Your business record could not be found.");
+      }
+
+      const serviceName =
+        document.getElementById("serviceName").value.trim();
+
+      const dateValue =
+        document.getElementById("appointmentDate").value;
+
+      const appointmentDate = new Date(dateValue);
+
+      if (!serviceName || !dateValue ||
+          isNaN(appointmentDate.getTime()) ||
+          appointmentDate <= new Date()) {
+        throw new Error("Please enter a future appointment date and time.");
+      }
+
+      const description =
+        document.getElementById("openingDescription").value.trim();
+
+      const { error: insertError } = await client
+        .from("appointment_openings")
+        .insert({
+          business_id: business.id,
+          service_name: serviceName,
+          description: description || null,
+          appointment_at: appointmentDate.toISOString(),
+          expires_at: appointmentDate.toISOString(),
+          status: "draft"
+        });
+
+      if (insertError) throw insertError;
+
+      output.textContent = "Opening saved as draft successfully!";
+      event.target.reset();
+
+    } catch (error) {
+      output.textContent = "Save error: " + error.message;
+    }
+  });
+
 document.getElementById("loginForm")
   .addEventListener("submit", async function(event) {
     event.preventDefault();
