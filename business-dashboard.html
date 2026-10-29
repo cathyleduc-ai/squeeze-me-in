@@ -113,7 +113,9 @@ button:disabled { opacity: .6; }
   </button>
 </div>
     <div id="businessProfileView" class="card hidden">
-      <h2 id="welcome">Welcome!</h2>
+     <button type="button" onclick="showDashboardView('appointments')">
+  ← Back to Appointments
+</button> <h2 id="welcome">Welcome!</h2>
       <p id="businessEmail"></p>
       <div class="status">
         <strong>Account status:</strong>
@@ -220,6 +222,19 @@ button:disabled { opacity: .6; }
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+
+function showDashboardView(view) {
+  const appointments = document.getElementById("appointmentsView");
+  const profile = document.getElementById("businessProfileView");
+
+  if (view === "profile") {
+    appointments.classList.add("hidden");
+    profile.classList.remove("hidden");
+  } else {
+    profile.classList.add("hidden");
+    appointments.classList.remove("hidden");
+  }
+}
 const client = window.supabase.createClient(
   "https://zhgieqcdirxywwbyprlo.supabase.co",
   "sb_publishable_brnqWUHE-F7TUx-6OcLgzw_Mk-aFOFy"
