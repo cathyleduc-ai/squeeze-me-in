@@ -530,6 +530,7 @@ async function loadMyOpenings() {
     .from("appointment_openings")
     .select("id,service_name,appointment_at,status,description")
     .eq("business_id", business.id)
+   .gt("appointment_at", new Date().toISOString())
     .order("appointment_at", { ascending: true });
 
   if (error) {
