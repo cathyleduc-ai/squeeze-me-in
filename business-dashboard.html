@@ -104,8 +104,15 @@ button:disabled { opacity: .6; }
   </section>
 
   <section id="dashboardSection" class="hidden">
-
-    <div class="card">
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin:15px 0;">
+  <button type="button" onclick="document.getElementById('appointmentsView').scrollIntoView({behavior:'smooth'})">
+    Appointments
+  </button>
+  <button type="button" onclick="document.getElementById('businessProfileView').scrollIntoView({behavior:'smooth'})">
+    Business Profile
+  </button>
+</div>
+    <div id="businessProfileView" class="card">
       <h2 id="welcome">Welcome!</h2>
       <p id="businessEmail"></p>
       <div class="status">
