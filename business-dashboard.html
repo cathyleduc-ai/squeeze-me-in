@@ -171,7 +171,31 @@ button:disabled { opacity: .6; }
   <button type="submit">Save Opening as Draft</button>
 </form>
 <p id="openingMessage" role="status"></p>
+<div id="editOpeningPanel" class="hidden"
+     style="border:2px solid #00B3B8; border-radius:12px; padding:18px; margin:20px 0; background:#EAF9F8;">
 
+  <h2>Edit Appointment</h2>
+
+  <form id="editOpeningForm">
+
+    <label for="editOpeningService">Service or appointment</label>
+    <input id="editOpeningService" type="text" required>
+
+    <label for="editOpeningDate">Appointment date and time</label>
+    <input id="editOpeningDate" type="datetime-local" required>
+
+    <label for="editOpeningDescription">Description (optional)</label>
+    <textarea id="editOpeningDescription" rows="3"></textarea>
+
+    <button type="submit">Save Changes</button>
+    <button type="button" id="cancelOpeningEdit"
+            style="background:#64748b;">Cancel</button>
+
+  </form>
+
+  <p id="editOpeningMessage" role="status"></p>
+
+</div>
 <h2>My Appointment Openings</h2>
 <p>View your saved appointment openings below.</p>
 <div id="myOpenings" aria-live="polite">
