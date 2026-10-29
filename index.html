@@ -606,6 +606,7 @@ if (directoryError) {
 }
 
 window.openingsReady = loadRealOpenings();
+  window.openingsReady.then(() => alert("Appointments loaded: " + (window.realAppointments || []).length));
   console.log("Squeeze Me In: Supabase connected");
 </script>
 
