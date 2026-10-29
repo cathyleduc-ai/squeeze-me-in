@@ -623,6 +623,80 @@ loadDashboard = async function() {
   }
 };
 
+document.getElementById("cancelOpeningEdit")
+  .addEventListener("click", () => {
+    document.getElementById("editOpeningPanel").classList.add("hidden");
+  });
+
+document.getElementById("editOpeningForm")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const panel = document.getElementById("editOpeningPanel");
+    const message = document.getElementById("editOpeningMessage");
+    const openingId = panel.dataset.openingId;
+
+    const service = document.getElementById("editOpeningService").value.trim();
+    const dateValue = document.getElementById("editOpeningDate").value;
+    const description = document.getElementById("editOpeningDescription").value.trim();
+
+    if (!openingId || !service || !dateValue) {
+      message.textContent = "Please complete all required fields.";
+      return;
+    }
+
+    const appointmentDate = new Date(dateValue);
+
+    if (Number.isNaN(appointmentDate.getTime())) {
+      message.textContent = "Please enter a valid date and time.";
+      return;
+    }
+
+    message.textContent = "Saving changes...";
+
+    const { data: { user }, error: userError } = await client.auth.getUser();
+
+    if (userError || !user) {
+      message.textContent = "Please sign in again.";
+      return;
+    }
+
+    const { data: business, error: businessError } = await client
+      .from("businesses")
+      .select("id")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+
+    if (businessError || !business) {
+      message.textContent = "Unable to verify your business.";
+      return;
+    }
+
+    const { data, error } = await client
+      .from("appointment_openings")
+      .update({
+        service_name: service,
+        appointment_at: appointmentDate.toISOString(),
+        description: description
+      })
+      .eq("id", openingId)
+      .eq("business_id", business.id)
+      .select("id");
+
+    if (error) {
+      message.textContent = "Unable to save changes: " + error.message;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      message.textContent = "Appointment not found or update not permitted.";
+      return;
+    }
+
+    panel.classList.add("hidden");
+    await loadMyOpenings();
+  });
+
 loadDashboard();
 </script>
 
