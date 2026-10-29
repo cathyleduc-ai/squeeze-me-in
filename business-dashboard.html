@@ -633,6 +633,10 @@ publishButton.style.cssText =
   "background:#00B3B8;color:white;padding:10px 18px;margin:10px 10px 0 0;border:0;border-radius:8px;cursor:pointer;";
 
 publishButton.addEventListener("click", async () => {
+  if (new Date(opening.appointment_at) <= new Date()) {
+  alert("You cannot publish an appointment in the past. Please edit the date and time first.");
+  return;
+}
   if (!confirm("Publish this appointment for customers to see?")) return;
 
   const { error } = await client
