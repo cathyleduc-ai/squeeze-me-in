@@ -451,7 +451,17 @@ if (searchLocation) {
       const matchesCategory = !category || item.category === category;
 const matchesDate = !selectedDate || dateString === selectedDate;
 
-const matchesDistance = !customerCoordinates || (
+const matchesDistance = !customerCoordinates ||
+  (!Number.isFinite(item.latitude) || !Number.isFinite(item.longitude)
+    ? (
+        searchLocation &&
+        (
+          item.location?.trim().toLowerCase() === searchLocation.trim().toLowerCase() ||
+          item.postal_code?.replace(/\s/g, "").toLowerCase() ===
+            searchLocation.replace(/\s/g, "").toLowerCase()
+        )
+      )
+    : (
   Number.isFinite(item.latitude) &&
   Number.isFinite(item.longitude) &&
   distanceKm(
@@ -467,7 +477,7 @@ const matchesDistance = !customerCoordinates || (
     item.postal_code?.replace(/\s/g, "").toLowerCase() ===
       searchLocation.replace(/\s/g, "").toLowerCase()
   )
-);
+));
 
      
      return matchesCategory && matchesDate && matchesDistance;
