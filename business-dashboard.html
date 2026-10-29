@@ -605,6 +605,33 @@ editButton.addEventListener("click", () => {
 });
 
 
+const publishButton = document.createElement("button");
+publishButton.type = "button";
+publishButton.textContent = "Publish";
+publishButton.style.cssText =
+  "background:#00B3B8;color:white;padding:10px 18px;margin:10px 10px 0 0;border:0;border-radius:8px;cursor:pointer;";
+
+publishButton.addEventListener("click", async () => {
+  if (!confirm("Publish this appointment for customers to see?")) return;
+
+  const { error } = await client
+    .from("appointment_openings")
+    .update({ status: "available" })
+    .eq("id", opening.id);
+
+  if (error) {
+    alert("Unable to publish: " + error.message);
+    return;
+  }
+
+  alert("Appointment published successfully!");
+  await loadMyOpenings();
+});
+
+if (opening.status === "draft") {
+  card.append(publishButton);
+}
+
 card.append(editButton);
 
 card.append(deleteButton);
