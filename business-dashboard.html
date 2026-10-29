@@ -578,38 +578,32 @@ editButton.textContent = "Edit";
 editButton.style.cssText =
   "background:#00B3B8;color:white;padding:10px 18px;margin:10px 10px 0 0;border:0;border-radius:8px;";
 
-editButton.addEventListener("click", async () => {
-  const service = prompt("Service or appointment:", opening.service_name);
-  if (service === null) return;
-  if (!service.trim()) {
-    alert("Service name cannot be empty.");
-    return;
-  }
 
-  const description = prompt(
-    "Description:",
-    opening.description || ""
+editButton.addEventListener("click", () => {
+  const panel = document.getElementById("editOpeningPanel");
+
+  document.getElementById("editOpeningService").value =
+    opening.service_name || "";
+
+  const date = new Date(opening.appointment_at);
+  const localDate = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000
   );
-  if (description === null) return;
 
-  
-const { error } = await client
-  .from("appointment_openings")
-  .update({
-    service_name: service.trim(),
-    description: description.trim()
-  })
-  .eq("id", opening.id);
+  document.getElementById("editOpeningDate").value =
+    localDate.toISOString().slice(0, 16);
 
-if (error) {
-  alert("Unable to save changes: " + error.message);
-  return;
-}
+  document.getElementById("editOpeningDescription").value =
+    opening.description || "";
 
-alert("Appointment updated successfully!");
-await loadMyOpenings();
+  document.getElementById("editOpeningMessage").textContent = "";
 
+  panel.dataset.openingId = opening.id;
+  panel.classList.remove("hidden");
+
+  panel.scrollIntoView({ behavior: "smooth", block: "start" });
 });
+
 
 card.append(editButton);
 
