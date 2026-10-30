@@ -572,6 +572,7 @@ if (bookingLink.href) {
 
   if (error) {
     console.error("Error loading openings:", error);
+    alert("Supabase error: " + error.message);
     return;
   }
 const { data: directory, error: directoryError } =
