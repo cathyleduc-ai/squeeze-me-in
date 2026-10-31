@@ -575,8 +575,8 @@ if (bookingLink.href) {
     alert("Supabase error: " + error.message);
     return;
   }
-    alert("Raw appointments from Supabase: " + (openings || []).length);
-    alert("Raw appointments from Supabase: " + (openings || []).length);
+  alert("Raw appointments from Supabase: " + (data || []).length);
+    
 const { data: directory, error: directoryError } =
   await supabaseClient
     .from("business_directory")
