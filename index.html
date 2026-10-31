@@ -580,7 +580,7 @@ if (bookingLink.href) {
 const { data: directory, error: directoryError } =
   await supabaseClient
     .from("business_directory")
-    .select("business_id, business_name, category, city, postal_code, phone, booking_url");
+    .select("business_id, business_name, category, city, postal_code, phone, booking_url, latitude, longitude");
 
 if (directoryError) {
   console.error("Error loading business directory:", directoryError);
@@ -601,6 +601,8 @@ if (directoryError) {
       category: business.category,
       location: business.city,
       postal_code: business.postal_code,
+      latitude: business.latitude == null ? null : Number(business.latitude),
+longitude: business.longitude == null ? null : Number(business.longitude),
       booking_url: item.booking_url || business.booking_url,
       phone: item.phone || business.phone
     };
