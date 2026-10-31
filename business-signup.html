@@ -175,6 +175,13 @@ data: {
         "Your business account registration has been submitted.";
 
       signupForm.reset();
+signupForm.style.display = "none";
+message.style.display = "block";
+message.style.padding = "20px";
+message.style.background = "#EAF9F8";
+message.style.borderRadius = "12px";
+message.style.fontWeight = "bold";
+message.scrollIntoView({ behavior: "smooth", block: "center" });
 
     } catch (error) {
       message.textContent =
