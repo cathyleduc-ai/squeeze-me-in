@@ -455,7 +455,7 @@ if (searchLocation) {
       const matchesCategory = !category || item.category === category;
 const matchesDate = !selectedDate || dateString === selectedDate;
 
-const matchesDistance = !customerCoordinates ||
+const matchesDistance = searchRadius === Infinity || !customerCoordinates ||
   (!Number.isFinite(item.latitude) || !Number.isFinite(item.longitude)
     ? (
         searchLocation &&
