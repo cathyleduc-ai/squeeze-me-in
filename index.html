@@ -597,7 +597,10 @@ if (directoryError) {
       entry => entry.business_id === item.business_id
     );
 
-    if (!business) return null;
+    if (!business) {
+  alert("Appointment has no matching business directory entry. Business ID: " + item.business_id);
+  return null;
+}
 
     return {
       ...item,
