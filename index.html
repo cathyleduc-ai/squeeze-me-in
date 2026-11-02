@@ -427,7 +427,7 @@ if (window.openingsReady) await window.openingsReady;
     const category = document.getElementById("category").value;
     const selectedDate = document.getElementById("date").value;
 const searchLocation = document.getElementById("location").value.trim();
-const searchRadius = Number(document.getElementById("radius").value);
+const searchRadius = document.getElementById("radius").value === "any" ? Infinity : Number(document.getElementById("radius").value);
     let customerCoordinates = null;
 
 if (searchLocation) {
