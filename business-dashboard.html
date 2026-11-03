@@ -147,7 +147,7 @@ button:disabled { opacity: .6; }
     <input id="editCity" placeholder="e.g. White Rock">
 
     <label for="editPhone">Business phone</label>
-    <input id="editPhone" type="tel">
+    <input id="editPhone" type="tel" inputmode="numeric" maxlength="12" placeholder="604-555-0100" oninput="let n=this.value.replace(/\D/g,'').slice(0,10);this.value=n.length>6?n.slice(0,3)+'-'+n.slice(3,6)+'-'+n.slice(6):n.length>3?n.slice(0,3)+'-'+n.slice(3):n">
 
     <label for="editBookingUrl">Booking website</label>
     <input id="editBookingUrl" type="url"
@@ -307,7 +307,9 @@ if (profile.status !== "approved") {
     profile.city || "Not added yet";
 
   document.getElementById("businessPhone").textContent =
-    profile.phone || "Not added yet";
+  profile.phone
+    ? profile.phone.replace(/\D/g, "").replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3")
+    : "Not added yet";
 
   document.getElementById("bookingUrl").textContent =
     profile.booking_url || "Not added yet";
@@ -433,7 +435,9 @@ async function fillBusinessEditForm() {
   document.getElementById("editCity").value =
     profile.city || "";
   document.getElementById("editPhone").value =
-    profile.phone || "";
+  (profile.phone || "")
+    .replace(/\D/g, "")
+    .replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3");
   document.getElementById("editBookingUrl").value =
     profile.booking_url || "";
 }
