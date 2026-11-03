@@ -576,13 +576,7 @@ const distanceMatches =
         "No appointments match your search. Try another category or date.";
       results.appendChild(message);
     }
-// TEMPORARY TEST — REMOVE AFTER TESTING
-if (matches.length === 1) {
-  matches = Array.from({ length: 25 }, (_, i) => ({
-    ...matches[0],
-    service_name: `TEST Haircut ${i + 1}`
-  }));
-}
+
     let visibleCount = 10;
 
 function displayOpenings() {
