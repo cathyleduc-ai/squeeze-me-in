@@ -577,7 +577,10 @@ const distanceMatches =
       results.appendChild(message);
     }
 
-    matches.forEach(function(item) {
+    let visibleCount = 10;
+
+function displayOpenings() {
+  matches.slice(0, visibleCount).forEach(function(item) {
       const card = document.createElement("div");
       card.style.cssText =
         "text-align:left;padding:14px 0;border-bottom:1px solid #ddd;";
@@ -623,6 +626,30 @@ if (bookingLink.href) {
       if (bookingLink.href) card.appendChild(bookingLink);
       results.appendChild(card);
     });
+
+}
+
+displayOpenings();
+
+if (matches.length > 10) {
+  const moreButton = document.createElement("button");
+  moreButton.textContent = "Show 10 More Openings";
+  moreButton.style.cssText =
+    "display:block;margin:20px auto;padding:12px 24px;background:#00aeb5;color:white;border:none;border-radius:10px;font-weight:bold;cursor:pointer;";
+
+  moreButton.addEventListener("click", function() {
+    visibleCount += 10;
+    results.replaceChildren();
+    results.appendChild(heading);
+    displayOpenings();
+
+    if (visibleCount < matches.length) {
+      results.appendChild(moreButton);
+    }
+  });
+
+  results.appendChild(moreButton);
+}
 
     document.getElementById("openings")
       .scrollIntoView({ behavior: "smooth" });
