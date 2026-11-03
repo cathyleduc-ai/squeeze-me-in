@@ -129,6 +129,9 @@ button:disabled { opacity: .6; }
       <p><strong>City:</strong>
         <span id="businessCity"></span>
       </p>
+      <p><strong>Street address:</strong>
+  <span id="businessStreetAddress"></span>
+</p>
       <p><strong>Phone:</strong>
         <span id="businessPhone"></span>
       </p>
@@ -266,7 +269,7 @@ async function loadDashboard() {
   const { data: profile, error } = await client
     .from("business_profiles")
     .select(
-      "business_name,email,city,phone,booking_url,status,trial_ends_at"
+      "business_name,email,city,street_address,phone,booking_url,status,trial_ends_at"
     )
     .eq("owner_id", user.id)
     .maybeSingle();
@@ -308,7 +311,8 @@ if (profile.status !== "approved") {
 
   document.getElementById("businessCity").textContent =
     profile.city || "Not added yet";
-
+document.getElementById("businessStreetAddress").textContent =
+  profile.street_address || "Not added yet";
   document.getElementById("businessPhone").textContent =
   profile.phone
     ? profile.phone.replace(/\D/g, "").replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3")
