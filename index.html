@@ -444,7 +444,7 @@ if (searchLocation) {
     return;
   }
 }
-   const matches = (window.realAppointments || []).filter(item => {
+   let matches = (window.realAppointments || []).filter(item => {
       const appointmentDate = new Date(item.appointment_at);
 
       const dateString =
@@ -487,11 +487,87 @@ const matchesDistance = searchRadius === Infinity || !customerCoordinates ||
      return matchesCategory && matchesDate && matchesDistance;
     });
 
+if (matches.length === 0 && selectedDate) {
+  const start = new Date(selectedDate + "T00:00:00");
+  const end = new Date(start);
+  end.setDate(end.getDate() + 14);
+
+  matches = (window.realAppointments || []).filter(item => {
+    const appointment = new Date(item.appointment_at);
+
+    const appointmentDay = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Vancouver",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(appointment);
+
+    const parts = Object.fromEntries(
+      appointmentDay.map(part => [part.type, part.value])
+    );
+    const day = `${parts.year}-${parts.month}-${parts.day}`;
+
+    const categoryMatches = !category || item.category === category;
+
+    
+const distanceMatches =
+  searchRadius === Infinity ||
+  !customerCoordinates ||
+  (
+    Number.isFinite(item.latitude) &&
+    Number.isFinite(item.longitude) &&
+    distanceKm(
+      customerCoordinates.latitude,
+      customerCoordinates.longitude,
+      item.latitude,
+      item.longitude
+    ) <= searchRadius
+  ) ||
+  (
+    searchLocation &&
+    (
+      item.location?.trim().toLowerCase() === searchLocation.toLowerCase() ||
+      item.postal_code?.replace(/\s/g, "").toLowerCase() ===
+        searchLocation.replace(/\s/g, "").toLowerCase()
+    )
+  );
+
+
+    return day > selectedDate &&
+      day <= [
+        end.getFullYear(),
+        String(end.getMonth() + 1).padStart(2, "0"),
+        String(end.getDate()).padStart(2, "0")
+      ].join("-") &&
+      categoryMatches &&
+      distanceMatches;
+  }).sort((a, b) =>
+    new Date(a.appointment_at) - new Date(b.appointment_at)
+  );
+}
+
     const results = document.getElementById("results");
     results.replaceChildren();
 
     const heading = document.createElement("h3");
-    heading.textContent = "Available Appointments 🎉";
+    heading.textContent =
+  selectedDate && matches.length > 0 &&
+  !matches.some(item => {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Vancouver",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date(item.appointment_at));
+
+    const date = Object.fromEntries(
+      parts.map(part => [part.type, part.value])
+    );
+
+    return `${date.year}-${date.month}-${date.day}` === selectedDate;
+  })
+    ? "No openings on your selected date — here are other options in the next 14 days! 📅"
+    : "Available Appointments 🎉";
     results.appendChild(heading);
 
     if (matches.length === 0) {
