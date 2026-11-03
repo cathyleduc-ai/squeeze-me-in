@@ -146,6 +146,9 @@ button:disabled { opacity: .6; }
     <label for="editCity">City</label>
     <input id="editCity" placeholder="e.g. White Rock">
 
+<label for="editStreetAddress">Street address</label>
+<input id="editStreetAddress" type="text" placeholder="e.g. 123 Main Street">
+
     <label for="editPhone">Business phone</label>
     <input id="editPhone" type="tel" inputmode="numeric" maxlength="12" placeholder="604-555-0100" oninput="let n=this.value.replace(/\D/g,'').slice(0,10);this.value=n.length>6?n.slice(0,3)+'-'+n.slice(3,6)+'-'+n.slice(6):n.length>3?n.slice(0,3)+'-'+n.slice(3):n">
 
@@ -424,7 +427,9 @@ async function fillBusinessEditForm() {
 
   const { data: profile, error } = await client
     .from("business_profiles")
-    .select("business_name,city,phone,booking_url")
+    
+.select("business_name,city,street_address,phone,booking_url")
+
     .eq("owner_id", user.id)
     .single();
 
@@ -434,6 +439,9 @@ async function fillBusinessEditForm() {
     profile.business_name || "";
   document.getElementById("editCity").value =
     profile.city || "";
+  
+document.getElementById("editStreetAddress").value = profile.street_address || "";
+
   document.getElementById("editPhone").value =
   (profile.phone || "")
     .replace(/\D/g, "")
@@ -470,6 +478,7 @@ document.getElementById("businessEditForm")
             document.getElementById("editCity").value.trim() || null,
           street_address:
   document.getElementById("editStreetAddress").value.trim() || null,
+
           phone:
             document.getElementById("editPhone").value.trim() || null,
           booking_url:
