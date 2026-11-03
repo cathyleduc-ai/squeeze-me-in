@@ -579,7 +579,7 @@ if (bookingLink.href) {
     alert("Supabase error: " + error.message);
     return;
   }
-  alert("Raw appointments from Supabase: " + (data || []).length);
+
     
 const { data: directory, error: directoryError } =
   await supabaseClient
@@ -618,7 +618,7 @@ longitude: business.longitude == null ? null : Number(business.longitude),
 }
 
 window.openingsReady = loadRealOpenings();
-  window.openingsReady.then(() => alert("Appointments loaded: " + (window.realAppointments || []).length));
+  
   console.log("Squeeze Me In: Supabase connected");
 </script>
 
