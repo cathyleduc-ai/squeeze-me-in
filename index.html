@@ -711,7 +711,7 @@ if (matches.length > 10) {
 const { data: directory, error: directoryError } =
   await supabaseClient
     .from("business_directory")
-    .select("business_id, business_name, category, city, postal_code, phone, booking_url, latitude, longitude");
+    .select("business_id, business_name, category, street_address, city, postal_code, phone, booking_url, latitude, longitude");
 
 if (directoryError) {
   console.error("Error loading business directory:", directoryError);
