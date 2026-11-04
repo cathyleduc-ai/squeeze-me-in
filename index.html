@@ -620,7 +620,13 @@ function displayOpenings() {
     hour: "numeric",
     minute: "2-digit"
   });
+const address = document.createElement("p");
 
+address.textContent = [
+  item.street_address,
+  item.location,
+  item.postal_code
+].filter(Boolean).join(", ");
       const note = document.createElement("em");
       note.textContent = "Contact the business to book this opening";
 const bookingLink = document.createElement("a");
@@ -640,7 +646,7 @@ if (bookingLink.href) {
     "display:inline-block;margin-top:10px;color:#00B3B8;font-weight:bold;";
   
 }
-      card.append(name, details, note);
+      card.append(name, details, address, note);
       if (bookingLink.href) card.appendChild(bookingLink);
       results.appendChild(card);
     });
