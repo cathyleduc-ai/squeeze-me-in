@@ -630,15 +630,18 @@ address.textContent = [
       const note = document.createElement("em");
       note.textContent = "Contact the business to book this opening";
 const bookingLink = document.createElement("a");
+const phoneLink = document.createElement("a");
 
 if (item.booking_url) {
   bookingLink.href = item.booking_url;
   bookingLink.textContent = "Book Now";
   bookingLink.target = "_blank";
   bookingLink.rel = "noopener noreferrer";
-} else if (item.phone) {
-  bookingLink.href = "tel:" + item.phone;
-  bookingLink.textContent = "Call to Book";
+}
+
+if (item.phone) {
+  phoneLink.href = "tel:" + item.phone;
+phoneLink.textContent = "Call to Book";
 }
 
 if (bookingLink.href) {
@@ -648,6 +651,29 @@ if (bookingLink.href) {
 }
       card.append(name, details, address, note);
       if (bookingLink.href) card.appendChild(bookingLink);
+    if (phoneLink.href) card.appendChild(phoneLink);
+    if (item.street_address) {
+  const directionsLink = document.createElement("a");
+
+  const fullAddress = [
+    item.street_address,
+    item.location,
+    item.postal_code
+  ].filter(Boolean).join(", ");
+
+  directionsLink.href =
+    "https://www.google.com/maps/dir/?api=1&destination=" +
+    encodeURIComponent(fullAddress);
+
+  directionsLink.textContent = "📍 Get Directions";
+  directionsLink.target = "_blank";
+  directionsLink.rel = "noopener noreferrer";
+
+  directionsLink.style.cssText =
+    "display:inline-block;margin:10px 0 0 12px;color:#F97316;font-weight:bold;";
+
+  card.appendChild(directionsLink);
+}
       results.appendChild(card);
     });
 
