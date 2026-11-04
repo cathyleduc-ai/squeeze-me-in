@@ -650,8 +650,11 @@ if (bookingLink.href) {
   
 }
       card.append(name, details, address, note);
-      if (bookingLink.href) card.appendChild(bookingLink);
-    if (phoneLink.href) card.appendChild(phoneLink);
+
+if (bookingLink.href) actionLinks.appendChild(bookingLink);
+if (phoneLink.href) actionLinks.appendChild(phoneLink);
+
+card.appendChild(actionLinks);
     if (item.street_address) {
   const directionsLink = document.createElement("a");
 
@@ -672,7 +675,7 @@ if (bookingLink.href) {
   directionsLink.style.cssText =
     "display:inline-block;margin:10px 0 0 12px;color:#F97316;font-weight:bold;";
 
-  card.appendChild(directionsLink);
+  actionLinks.appendChild(directionsLink);
 }
       results.appendChild(card);
     });
