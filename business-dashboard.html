@@ -193,7 +193,13 @@ button:disabled { opacity: .6; }
   <textarea id="openingDescription"
             placeholder="Additional appointment details"></textarea>
 
-  <button type="submit">Save Opening as Draft</button>
+  <button type="submit" name="action" value="publish">
+  Publish Opening
+</button>
+
+<button type="submit" name="action" value="draft">
+  Save as Draft
+</button>
 </form>
 <p id="openingMessage" role="status"></p>
 <div id="editOpeningPanel" class="hidden"
@@ -413,14 +419,16 @@ const category = document.getElementById("openingCategory").value;
           description: description || null,
           appointment_at: appointmentDate.toISOString(),
           expires_at: appointmentDate.toISOString(),
-          status: "draft"
+          status: event.submitter?.value === "publish" ? "available" : "draft"
         });
 
       if (insertError) throw insertError;
 
-      output.textContent = "Opening saved as draft successfully!";
+      output.textContent = event.submitter?.value === "publish"
+  ? "Opening published successfully!"
+  : "Opening saved as draft successfully!";
       event.target.reset();
-
+await loadMyOpenings();
     } catch (error) {
       output.textContent = "Save error: " + error.message;
     }
