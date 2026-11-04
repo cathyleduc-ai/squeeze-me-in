@@ -189,17 +189,30 @@ button:disabled { opacity: .6; }
   <label for="appointmentDate">Appointment date and time</label>
   <input id="appointmentDate" type="datetime-local" required>
 
-  <label for="openingDescription">Description (optional)</label>
+  
+<div style="margin-bottom:20px;">
+  <label for="openingDescription"
+         style="display:block; margin-bottom:8px;">
+    Description (optional)
+  </label>
   <textarea id="openingDescription"
-            placeholder="Additional appointment details"></textarea>
+            placeholder="Additional appointment details"
+            rows="3"
+            style="display:block; width:100%; box-sizing:border-box;"></textarea>
+</div>
 
-  <button type="submit" name="action" value="publish">
-  Publish Opening
-</button>
+<div style="display:flex; flex-direction:column; gap:12px; width:100%;">
+  <button type="submit" name="action" value="publish"
+          style="display:block; width:100%; box-sizing:border-box;">
+    Publish Opening
+  </button>
 
-<button type="submit" name="action" value="draft">
-  Save as Draft
-</button>
+  <button type="submit" name="action" value="draft"
+          style="display:block; width:100%; box-sizing:border-box;">
+    Save as Draft
+  </button>
+</div>
+
 </form>
 <p id="openingMessage" role="status"></p>
 <div id="editOpeningPanel" class="hidden"
