@@ -441,6 +441,10 @@ function distanceKm(lat1, lon1, lat2, lon2) {
 document.getElementById("searchForm")
   .addEventListener("submit", async function(event) {
     event.preventDefault();
+    document.getElementById("openings").scrollIntoView({
+  behavior: "smooth",
+  block: "start"
+});
 if (window.openingsReady) await window.openingsReady;
     const category = document.getElementById("category").value;
     const selectedDate = document.getElementById("date").value;
