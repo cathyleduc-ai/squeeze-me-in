@@ -61,6 +61,9 @@ button {
   cursor: pointer;
   margin-top: 16px;
 }
+input[type="datetime-local"] { display:block; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; }
+input[type="datetime-local"]::-webkit-date-and-time-value { min-width:0; text-align:left; }
+#editProvince { width:100%; padding:13px; font-size:16px; border:1px solid #ccc; border-radius:8px; }
 button:disabled { opacity: .6; }
 .secondary { background: #00B3B8; }
 .hidden { display: none; }
@@ -132,6 +135,8 @@ button:disabled { opacity: .6; }
       <p><strong>Street address:</strong>
   <span id="businessStreetAddress"></span>
 </p>
+      <p><strong>Province or territory:</strong> <span id="businessProvince"></span></p>
+      <p><strong>Postal code:</strong> <span id="businessPostalCode"></span></p>
       <p><strong>Phone:</strong>
         <span id="businessPhone"></span>
       </p>
@@ -152,6 +157,10 @@ button:disabled { opacity: .6; }
 <label for="editStreetAddress">Street address</label>
 <input id="editStreetAddress" type="text" placeholder="e.g. 123 Main Street">
 
+    <label for="editProvince">Province or territory</label>
+    <select id="editProvince"><option value="">Select province or territory</option><option value="AB">Alberta</option><option value="BC">British Columbia</option><option value="MB">Manitoba</option><option value="NB">New Brunswick</option><option value="NL">Newfoundland and Labrador</option><option value="NS">Nova Scotia</option><option value="NT">Northwest Territories</option><option value="NU">Nunavut</option><option value="ON">Ontario</option><option value="PE">Prince Edward Island</option><option value="QC">Quebec</option><option value="SK">Saskatchewan</option><option value="YT">Yukon</option></select>
+    <label for="editPostalCode">Postal code</label>
+    <input id="editPostalCode" maxlength="7" placeholder="A1A 1A1" autocomplete="postal-code" autocapitalize="characters" pattern="[A-Za-z][0-9][A-Za-z] ?[0-9][A-Za-z][0-9]">
     <label for="editPhone">Business phone</label>
     <input id="editPhone" type="tel" inputmode="numeric" maxlength="12" placeholder="604-555-0100" oninput="let n=this.value.replace(/\D/g,'').slice(0,10);this.value=n.length>6?n.slice(0,3)+'-'+n.slice(3,6)+'-'+n.slice(6):n.length>3?n.slice(0,3)+'-'+n.slice(3):n">
 
@@ -314,7 +323,7 @@ async function loadDashboard() {
   const { data: profile, error } = await client
     .from("business_profiles")
     .select(
-      "business_name,email,city,street_address,phone,booking_url,status,trial_ends_at"
+      "business_name,email,city,street_address,province,postal_code,phone,booking_url,status,trial_ends_at"
     )
     .eq("owner_id", user.id)
     .maybeSingle();
@@ -358,6 +367,8 @@ if (profile.status !== "approved") {
     profile.city || "Not added yet";
 document.getElementById("businessStreetAddress").textContent =
   profile.street_address || "Not added yet";
+  document.getElementById("businessProvince").textContent = profile.province || "Not added yet";
+  document.getElementById("businessPostalCode").textContent = profile.postal_code || "Not added yet";
   document.getElementById("businessPhone").textContent =
   profile.phone
     ? profile.phone.replace(/\D/g, "").replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3")
@@ -480,7 +491,7 @@ async function fillBusinessEditForm() {
   const { data: profile, error } = await client
     .from("business_profiles")
     
-.select("business_name,city,street_address,phone,booking_url")
+.select("business_name,city,street_address,province,postal_code,phone,booking_url")
 
     .eq("owner_id", user.id)
     .single();
@@ -494,6 +505,8 @@ async function fillBusinessEditForm() {
   
 document.getElementById("editStreetAddress").value = profile.street_address || "";
 
+  document.getElementById("editProvince").value = profile.province || "";
+  document.getElementById("editPostalCode").value = profile.postal_code || "";
   document.getElementById("editPhone").value =
   (profile.phone || "")
     .replace(/\D/g, "")
@@ -531,6 +544,8 @@ document.getElementById("businessEditForm")
           street_address:
   document.getElementById("editStreetAddress").value.trim() || null,
 
+          province: document.getElementById("editProvince").value || null,
+          postal_code: document.getElementById("editPostalCode").value.trim().toUpperCase().replace(/\s/g, "") || null,
           phone:
             document.getElementById("editPhone").value.trim() || null,
           booking_url:
@@ -595,7 +610,7 @@ async function loadMyOpenings() {
 
   const { data: openings, error } = await client
     .from("appointment_openings")
-    .select("id,service_name,appointment_at,status,description")
+    .select("id,service_name,category,appointment_at,status,description")
     .eq("business_id", business.id)
    .gt("appointment_at", new Date().toISOString())
     .order("appointment_at", { ascending: true });
@@ -767,8 +782,8 @@ const category = document.getElementById("editOpeningCategory").value;
 
     const appointmentDate = new Date(dateValue);
 
-    if (Number.isNaN(appointmentDate.getTime())) {
-      message.textContent = "Please enter a valid date and time.";
+    if (Number.isNaN(appointmentDate.getTime()) || appointmentDate <= new Date()) {
+      message.textContent = "Please enter a future date and time.";
       return;
     }
 
@@ -798,6 +813,7 @@ const category = document.getElementById("editOpeningCategory").value;
         service_name: service,
         category: category,
         appointment_at: appointmentDate.toISOString(),
+        expires_at: appointmentDate.toISOString(),
         description: description
       })
       .eq("id", openingId)
