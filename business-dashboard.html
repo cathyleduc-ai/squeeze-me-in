@@ -1,783 +1,862 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Squeeze Me In | Last-Minute Appointments</title>
-  <style>
-    :root {
-      --turquoise: #00B3B8;
-      --orange: #FF7A00;
-      --yellow: #FFC82C;
-      --mint: #EAF9F8;
-      --navy: #1F2937;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      color: var(--navy);
-      background: #fff;
-    }
-
-    header {
-      padding: 18px 6%;
-      display: flex;
-      justify-content: center; align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid #eee;
-    }
-
-    .logo {
-      font-size: 24px;
-      font-weight: 900;
-      color: var(--turquoise);
-      letter-spacing: -1px;
-    }
-
-    .logo span { color: var(--orange); }
-
-    .business-link {
-  display: inline-block;
-  background: #00B3B8;
-  color: white;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Dashboard | Squeeze Me In</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #EAF9F8;
+  color: #1F2937;
+}
+header {
+  background: white;
+  padding: 22px;
+  text-align: center;
+  border-bottom: 3px solid #00B3B8;
+}
+header a {
+  color: #00B3B8;
   text-decoration: none;
+  font-size: 28px;
   font-weight: bold;
-  font-size: 12px;
-  padding: 9px 12px;
-  border-radius: 20px;
-  white-space: nowrap;
 }
-
-    .hero {
-      text-align: center;
-      padding: 65px 20px 55px;
-      background: var(--mint);
-    }
-
-    .hero h1 {
-      font-size: clamp(34px, 7vw, 58px);
-      line-height: 1.1;
-      margin: 0 auto 18px;
-      max-width: 700px;
-    }
-
-    .hero h1 span { color: var(--orange); }
-
-    .hero p {
-      font-size: 18px;
-      line-height: 1.5;
-      max-width: 540px;
-      margin: 0 auto 30px;
-    }
-
-    .search-box {
-      background: white;
-      max-width: 750px;
-      margin: auto;
-      padding: 22px;
-      border-radius: 20px;
-      box-shadow: 0 8px 30px #00000012;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    input, select, button {
-      width: 100%;
-      padding: 15px;
-      border-radius: 10px;
-      border: 1px solid #d5dce0;
-      font-size: 16px;
-      font-family: inherit;
-    }
-.search-box input,
-.search-box select {
-  background-color: #ffffff;
-  color: #1f2937;
-  border: 1px solid #cbd5e1;
-  box-sizing: border-box;
+main {
+  max-width: 650px;
+  margin: 30px auto;
+  padding: 24px;
+}
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px #00000010;
+}
+h1 { font-size: 27px; }
+h2 { font-size: 21px; }
+label {
+  display: block;
+  font-weight: bold;
+  margin: 14px 0 6px;
+}
+input {
   width: 100%;
-min-width: 0;
+  padding: 13px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
 }
-    button {
-      background: var(--orange);
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover { background: #e66d00; }
-
-    .section {
-      padding: 55px 6%;
-      max-width: 1100px;
-      margin: auto;
-      text-align: center;
-    }
-
-    .section h2 {
-      font-size: 30px;
-      margin: 0 0 12px;
-    }
-
-    .section > p {
-      color: #596579;
-      margin-bottom: 30px;
-    }
-
-    .categories {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    .category {
-      padding: 26px 12px;
-      border-radius: 18px;
-      background: var(--mint);
-      font-weight: bold;
-    }
-
-    .emoji {
-      font-size: 38px;
-      display: block;
-      margin-bottom: 12px;
-    }
-
-    .openings {
-      background: #fffaf0;
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    .empty-state {
-      background: white;
-      border: 2px dashed var(--yellow);
-      border-radius: 18px;
-      max-width: 550px;
-      padding: 30px;
-      margin: 25px auto 0;
-    }
-
-    .business {
-      background: var(--turquoise);
-      color: white;
-      text-align: center;
-      padding: 65px 20px;
-    }
-
-    .business h2 {
-      font-size: 32px;
-      margin-top: 0;
-    }
-
-    .business p {
-      max-width: 500px;
-      margin: 0 auto 25px;
-      line-height: 1.6;
-    }
-
-    .business button {
-      background: var(--yellow);
-      color: var(--navy);
-      max-width: 250px;
-    }
-
-    footer {
-      padding: 28px;
-      text-align: center;
-      font-size: 14px;
-      color: #697586;
-    }
-
-    @media (max-width: 650px) {
-      .logo { font-size: 20px; }
-
-      .search-box {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .categories {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .hero { padding-top: 48px; }
-    }
-    .opening-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:12px; }
-    .opening-actions a { display:flex; align-items:center; justify-content:center; text-align:center; padding:12px 6px; border-radius:9px; border:1px solid transparent; font-size:14px; font-weight:bold; text-decoration:none; overflow-wrap:anywhere; }
-    .opening-actions a:last-child:nth-child(odd) { grid-column:1 / -1; }
-    .opening-actions .call-action { background:#007F85; color:white; }
-    .opening-actions .booking-action { background:#B84F00; color:white; }
-    .opening-actions .website-action { border-color:#007F85; color:#007F85; }
-    .opening-actions .directions-action { border-color:#B84F00; color:#B84F00; }
-  </style>
+button {
+  background: #FF7A00;
+  color: white;
+  border: 0;
+  border-radius: 9px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 16px;
+}
+input[type="datetime-local"] { display:block; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; }
+input[type="datetime-local"]::-webkit-date-and-time-value { min-width:0; text-align:left; }
+#editProvince { width:100%; padding:13px; font-size:16px; border:1px solid #ccc; border-radius:8px; }
+button:disabled { opacity: .6; }
+.secondary { background: #00B3B8; }
+.hidden { display: none; }
+.status {
+  background: #FFF5E8;
+  padding: 15px;
+  border-radius: 9px;
+}
+#message { line-height: 1.5; }
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="logo"><img src="IMG_2305.png" alt="Squeeze Me In" style="width:110px;max-width:100%;height:auto;display:block;"></div>
-   
-  </header>
+<header>
+  <a href="/">Squeeze Me In</a>
+</header>
 
-  <main>
-    <section class="hero">
-      <h1>Last-minute plans? <span>We've got an opening!</span></h1>
-      <p>
-        Find available appointments at local businesses.
-        Great services, convenient times, right near you.
+<main>
+  <h1>Business Dashboard</h1>
+
+  <p id="message" role="status">
+    Checking your account...
+  </p>
+
+  <section id="loginSection" class="card hidden">
+    <h2>Business Login</h2>
+    <form id="loginForm">
+      <label for="email">Business email</label>
+      <input id="email" type="email" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password" required>
+
+      <button type="submit">Sign In</button>
+    </form>
+    <p><a href="/reset-password.html">Forgot Password?</a></p>
+    <p>
+      New business?
+      <a href="/business-signup.html">Create an account</a>
+    </p>
+  </section>
+
+  <section id="dashboardSection" class="hidden">
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin:15px 0;">
+  <button type="button" onclick="showDashboardView('profile')">
+  Business Profile
+</button>
+  </div>
+    <div id="businessProfileView" class="card hidden">
+     <button type="button" onclick="showDashboardView('appointments')">
+  ← Back to Appointments
+</button> <h2 id="welcome">Welcome!</h2>
+      <p id="businessEmail"></p>
+      <div class="status">
+        <strong>Account status:</strong>
+        <span id="accountStatus"></span>
+      </div>
+      <p id="trialMessage"></p>
+    
+
+    <div class="card">
+      <h2>Business Information</h2>
+      <p><strong>Business name:</strong>
+        <span id="businessName"></span>
       </p>
+      <p><strong>City:</strong>
+        <span id="businessCity"></span>
+      </p>
+      <p><strong>Street address:</strong>
+  <span id="businessStreetAddress"></span>
+</p>
+      <p><strong>Province or territory:</strong> <span id="businessProvince"></span></p>
+      <p><strong>Postal code:</strong> <span id="businessPostalCode"></span></p>
+      <p><strong>Phone:</strong>
+        <span id="businessPhone"></span>
+      </p>
+      <p><strong>Business website:</strong>
+        <span id="websiteUrl"></span>
+      </p>
+      <p><strong>Online booking website:</strong>
+        <span id="bookingUrl"></span>
+      </p>
+    </div>
+<div class="card">
+  <h2>Edit Business Information</h2>
 
-      <form class="search-box" id="searchForm">
-        <select id="category" aria-label="Service category">
-          <option value="">All services</option>
-          <option>Hair & Beauty</option>
-          <option>Nails & Spa</option>
-          <option>Health & Wellness</option>
-          <option>Fitness</option>
-          <option>Pet Services</option>
-          <option>Home Services</option>
-          <option>Other Services</option>
-        </select>
+  <form id="businessEditForm">
+    <label for="editBusinessName">Business name</label>
+    <input id="editBusinessName" required maxlength="120">
 
-        <input id="location" type="text"
-       placeholder="City or postal code (Canada)"
-       aria-label="Canadian city or postal code"
-       autocomplete="off">
+    <label for="editCity">City</label>
+    <input id="editCity" placeholder="e.g. White Rock">
 
-        
-<select id="radius" aria-label="Distance">
-  <option value="5" selected>Within 5 km</option>
-  <option value="10">Within 10 km</option>
-  <option value="25">Within 25 km</option>
-  <option value="50">Within 50 km</option>
-  <option value="100">Within 100 km</option>
-  <option value="any">Any distance</option>
+<label for="editStreetAddress">Street address</label>
+<input id="editStreetAddress" type="text" placeholder="e.g. 123 Main Street">
+
+    <label for="editProvince">Province or territory</label>
+    <select id="editProvince"><option value="">Select province or territory</option><option value="AB">Alberta</option><option value="BC">British Columbia</option><option value="MB">Manitoba</option><option value="NB">New Brunswick</option><option value="NL">Newfoundland and Labrador</option><option value="NS">Nova Scotia</option><option value="NT">Northwest Territories</option><option value="NU">Nunavut</option><option value="ON">Ontario</option><option value="PE">Prince Edward Island</option><option value="QC">Quebec</option><option value="SK">Saskatchewan</option><option value="YT">Yukon</option></select>
+    <label for="editPostalCode">Postal code</label>
+    <input id="editPostalCode" maxlength="7" placeholder="A1A 1A1" autocomplete="postal-code" autocapitalize="characters" pattern="[A-Za-z][0-9][A-Za-z] ?[0-9][A-Za-z][0-9]">
+    <label for="editPhone">Business phone</label>
+    <input id="editPhone" type="tel" inputmode="numeric" maxlength="12" placeholder="604-555-0100" oninput="let n=this.value.replace(/\D/g,'').slice(0,10);this.value=n.length>6?n.slice(0,3)+'-'+n.slice(3,6)+'-'+n.slice(6):n.length>3?n.slice(0,3)+'-'+n.slice(3):n">
+
+    <label for="editWebsiteUrl">Business website (optional)</label>
+    <input id="editWebsiteUrl" type="url" placeholder="https://yourbusiness.com">
+
+    <label for="editBookingUrl">Online booking website (optional)</label>
+    <input id="editBookingUrl" type="url"
+      placeholder="https://yourbookingwebsite.com">
+
+    <button type="submit">Save Business Information</button>
+  </form>
+
+  <p id="editMessage" role="status"></p>
+</div>
+    </div>  
+    <div id="appointmentsView" class="card">
+      <h2>Appointment Openings</h2>
+      
+<form id="openingForm">
+  <label for="serviceName">Service or appointment</label>
+  <input id="serviceName" type="text"
+         placeholder="e.g. Haircut, Massage, Dental Cleaning"
+         required maxlength="120">
+
+<label for="openingCategory">Appointment Category</label>
+<select id="openingCategory" required
+  style="background:#DDF7F5; color:#1f2937; border:1px solid #00B3B8; border-radius:10px; padding:12px; width:100%; box-sizing:border-box;">
+  <option value="">Select a category</option>
+  <option value="Hair & Beauty">Hair & Beauty</option>
+  <option value="Nails & Spa">Nails & Spa</option>
+  <option value="Health & Wellness">Health & Wellness</option>
+  <option value="Fitness">Fitness</option>
+  <option value="Pet Services">Pet Services</option>
+  <option value="Home Services">Home Services</option>
+  <option value="Other Services">Other Services</option>
 </select>
 
+  <label for="appointmentDate">Appointment date and time</label>
+  <input id="appointmentDate" type="datetime-local" required
+  style="background:#ffffff; border:1px solid #cccccc; border-radius:10px; padding:14px; width:100%; box-sizing:border-box; color:#1f2937;">
 
-        <input id="date" type="date"
-       aria-label="Appointment date"
-       style="display:block; width:100%; max-width:100%; min-width:0; box-sizing:border-box;">
-
-        <button type="submit">Find an Opening →</button>
-      </form>
-    </section>
-<div style="text-align:center; padding:22px 16px;">
-  <a class="business-link" href="#business">For Businesses →</a>
+  
+<div style="margin-bottom:20px;">
+  <label for="openingDescription"
+         style="display:block; margin-bottom:8px;">
+    Description (optional)
+  </label>
+  <textarea id="openingDescription"
+            placeholder="Additional appointment details"
+            rows="3"
+            style="display:block; width:100%; box-sizing:border-box;"></textarea>
 </div>
-    <section class="section">
-      <h2>What can we squeeze you in for?</h2>
-      <p>Explore last-minute openings by category.</p>
 
-      <div class="categories">
-        <div class="category" onclick="document.getElementById('category').value='Hair & Beauty'; document.getElementById('searchForm').requestSubmit(); document.getElementById('openings').scrollIntoView({behavior:'smooth'});">
-          <span class="emoji">💇</span>Hair & Beauty
-        </div>
-        <div class="category" onclick="document.getElementById('category').value='Nails & Spa'; document.getElementById('searchForm').requestSubmit(); document.getElementById('openings').scrollIntoView({behavior:'smooth'});">
-          <span class="emoji">💅</span>Nails & Spa
-        </div>
-        <div class="category" onclick="document.getElementById('category').value='Health & Wellness'; document.getElementById('searchForm').requestSubmit(); document.getElementById('openings').scrollIntoView({behavior:'smooth'});">
-          <span class="emoji">💆</span>Health & Wellness
-        </div>
-        <div class="category" onclick="document.getElementById('category').value='Fitness'; document.getElementById('searchForm').requestSubmit(); document.getElementById('openings').scrollIntoView({behavior:'smooth'});">
-          <span class="emoji">🏋️</span>Fitness
-        </div>
-        <div class="category" onclick="document.getElementById('category').value='Pet Services'; document.getElementById('searchForm').requestSubmit(); document.getElementById('openings').scrollIntoView({behavior:'smooth'});">
-          <span class="emoji">🐾</span>Pet Services
-        </div>
-      <div class="category" onclick="document.getElementById('category').value='Home Services'; document.getElementById('searchForm').requestSubmit(); document.getElementById('openings').scrollIntoView({behavior:'smooth'});">
-          <span class="emoji">🧹</span>Home Services
-        </div>
-        <div class="category" onclick="document.getElementById('category').value='Other Services'; document.getElementById('searchForm').requestSubmit(); document.getElementById('openings').scrollIntoView({behavior:'smooth'});">
-          <span class="emoji">✨</span>Other Services
-        </div>
-      </div>
-    </section>
+<div style="display:flex; flex-direction:column; gap:12px; width:100%;">
+  <button type="submit" name="action" value="publish"
+          style="display:block; width:100%; box-sizing:border-box;">
+    Publish Opening
+  </button>
 
-    <section class="openings" id="openings">
-      <h2>Fresh Openings</h2>
-      <p>Find a spot that fits your schedule.</p>
+  <button type="submit" name="action" value="draft"
+          style="display:block; width:100%; box-sizing:border-box;">
+    Save as Draft
+  </button>
+</div>
 
-      <div class="empty-state" id="results">
-        <h3>Something good is coming! 🎉</h3>
-        <p>
-          Local appointment openings will appear here
-          as businesses join Squeeze Me In.
-        </p>
-      </div>
-    </section>
+</form>
+<p id="openingMessage" role="status"></p>
+<div id="editOpeningPanel" class="hidden"
+     style="border:2px solid #00B3B8; border-radius:12px; padding:18px; margin:20px 0; background:#EAF9F8;">
 
-    <section class="business" id="business">
-      <h2>Got an opening? Fill it!</h2>
-      <p>
-        Turn last-minute cancellations and unused
-        appointment times into new opportunities.
-        Post an opening and let nearby customers find you.
-      </p>
-      <button type="button" id="businessButton">
-        List Your Business
-      </button>
-      
-<p style="margin-top: 18px; text-align: center;">
-  Already signed up?
-  <a href="business-dashboard.html"
-     style="color: #ffffff; font-weight: bold; text-decoration: underline;">
-    Sign In
-  </a>
-</p>
+  <h2>Edit Appointment</h2>
 
-    </section>
-  </main>
+  <form id="editOpeningForm">
 
-  <footer>
-    © <span id="year"></span> Squeeze Me In.
-    Made for local businesses.
-  </footer>
+    <label for="editOpeningService">Service or appointment</label>
+    <input id="editOpeningService" type="text" required>
 
-  <script>
-    
-const SUPABASE_URL = "https://zhgieqcdirxywwbyprlo.supabase.co";
-const SUPABASE_KEY = "sb_publishable_brnqWUHE-F7TUx-6OcLgzw_Mk-aFOFy";
+<label for="editOpeningCategory">Appointment category</label>
+<select id="editOpeningCategory" required>
+  <option value="">Select a category</option>
+  <option value="Hair & Beauty">Hair & Beauty</option>
+  <option value="Nails & Spa">Nails & Spa</option>
+  <option value="Health & Wellness">Health & Wellness</option>
+  <option value="Fitness">Fitness</option>
+  <option value="Pet Services">Pet Services</option>
+  <option value="Home Services">Home Services</option>
+  <option value="Other Services">Other Services</option>
+</select>
 
-    document.getElementById("year").textContent =
-      new Date().getFullYear();
+    <label for="editOpeningDate">Appointment date and time</label>
+    <input id="editOpeningDate" type="datetime-local" required>
 
-    const dateInput = document.getElementById("date");
-    const today = new Date();
-    const localDate = new Date(
-      today.getTime() - today.getTimezoneOffset() * 60000
-    ).toISOString().split("T")[0];
+    <label for="editOpeningDescription">Description (optional)</label>
+    <textarea id="editOpeningDescription" rows="3"></textarea>
 
-    dateInput.min = localDate;
-    dateInput.value = localDate;
+    <button type="submit">Save Changes</button>
+    <button type="button" id="cancelOpeningEdit"
+            style="background:#64748b;">Cancel</button>
 
-    
-const demoAppointments = [
-  {
-    category: "Hair & Beauty",
-    service: "Haircut",
-    business: "Sample Hair Studio",
-    location: "White Rock",
-    province: "BC",
-country: "CA",
-    latitude: 49.0253,
-longitude: -122.8029,
-    daysFromToday: 0,
-    time: "2:00 PM",
-    emoji: "💇"
-  },
-  {
-    category: "Nails & Spa",
-    service: "Manicure",
-    business: "Sample Nail Studio",
-    location: "South Surrey",
-    province: "BC",
-country: "CA",
-    latitude: 49.0480,
-longitude: -122.7950,
-    daysFromToday: 1,
-    time: "11:00 AM",
-    emoji: "💅"
-  },
-  {
-    category: "Health & Wellness",
-    service: "Massage",
-    business: "Sample Wellness Studio",
-    location: "White Rock",
-    province: "BC",
-country: "CA",
-    latitude: 49.0253,
-longitude: -122.8029,
-    daysFromToday: 1,
-    time: "3:30 PM",
-    emoji: "💆"
-  }
-];
-function distanceKm(lat1, lon1, lat2, lon2) {
-  const toRadians = degrees => degrees * Math.PI / 180;
-  const earthRadiusKm = 6371;
+  </form>
 
-  const latitudeDifference = toRadians(lat2 - lat1);
-  const longitudeDifference = toRadians(lon2 - lon1);
+  <p id="editOpeningMessage" role="status"></p>
 
-  const a =
-    Math.sin(latitudeDifference / 2) ** 2 +
-    Math.cos(toRadians(lat1)) *
-    Math.cos(toRadians(lat2)) *
-    Math.sin(longitudeDifference / 2) ** 2;
+</div>
+<h2>My Appointment Openings</h2>
+<p>View your saved appointment openings below.</p>
+<div id="myOpenings" aria-live="polite">
+  Loading your appointments...
+</div>
 
-  return earthRadiusKm * 2 *
-    Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-    async function lookupLocation(searchText) {
-  if (!searchText.trim()) {
-    return null;
-  }
+    </div>
 
-  const apiKey = "c034aa1835b342368a050c05b5689089";
+    <button id="signOutButton" class="secondary">
+      Sign Out
+    </button>
 
-  if (!apiKey) {
-    return null;
-  }
-
-  const url = new URL("https://api.geoapify.com/v1/geocode/search");
-  url.searchParams.set("text", searchText + ", Canada");
-  url.searchParams.set("filter", "countrycode:ca");
-  url.searchParams.set("limit", "1");
-  url.searchParams.set("apiKey", apiKey);
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error("Location lookup failed");
-  }
-
-  const data = await response.json();
-  const place = data.features?.[0]?.properties;
-
-  if (!place) {
-    return null;
-  }
-
-  return {
-    latitude: place.lat,
-    longitude: place.lon
-  };
-}
-document.getElementById("searchForm")
-  .addEventListener("submit", async function(event) {
-    event.preventDefault();
-    document.getElementById("openings").scrollIntoView({
-  behavior: "smooth",
-  block: "start"
-});
-if (window.openingsReady) await window.openingsReady;
-    const category = document.getElementById("category").value;
-    const selectedDate = document.getElementById("date").value;
-const searchLocation = document.getElementById("location").value.trim();
-const searchRadius = document.getElementById("radius").value === "any" ? Infinity : Number(document.getElementById("radius").value);
-    let customerCoordinates = null;
-
-if (searchLocation) {
-  try {
-    customerCoordinates = await lookupLocation(searchLocation);
-
-    if (!customerCoordinates) {
-      alert("We couldn't find that location. Please try a Canadian city or postal code.");
-      return;
-    }
-  } catch (error) {
-    console.error("Location lookup error:", error);
-    alert("Location search is temporarily unavailable. Please try again.");
-    return;
-  }
-}
-   let matches = (window.realAppointments || []).filter(item => {
-      const appointmentDate = new Date(item.appointment_at);
-
-      const dateString =
-        appointmentDate.getFullYear() + "-" +
-        String(appointmentDate.getMonth() + 1).padStart(2, "0") + "-" +
-        String(appointmentDate.getDate()).padStart(2, "0");
-
-      const matchesCategory = !category || item.category === category;
-const matchesDate = !selectedDate || dateString === selectedDate;
-
-const matchesDistance = searchRadius === Infinity || !customerCoordinates ||
-  (!Number.isFinite(item.latitude) || !Number.isFinite(item.longitude)
-    ? (
-        searchLocation &&
-        (
-          item.location?.trim().toLowerCase() === searchLocation.trim().toLowerCase() ||
-          item.postal_code?.replace(/\s/g, "").toLowerCase() ===
-            searchLocation.replace(/\s/g, "").toLowerCase()
-        )
-      )
-    : (
-  Number.isFinite(item.latitude) &&
-  Number.isFinite(item.longitude) &&
-  distanceKm(
-    customerCoordinates.latitude,
-    customerCoordinates.longitude,
-    item.latitude,
-    item.longitude
-  ) <= searchRadius
-) || (
-  searchLocation &&
-  (
-    item.location?.toLowerCase() === searchLocation.toLowerCase() ||
-    item.postal_code?.replace(/\s/g, "").toLowerCase() ===
-      searchLocation.replace(/\s/g, "").toLowerCase()
-  )
-));
-
-     
-     return matchesCategory && matchesDate && matchesDistance;
-    });
-
-if (matches.length === 0 && selectedDate) {
-  const start = new Date(selectedDate + "T00:00:00");
-  const end = new Date(start);
-  end.setDate(end.getDate() + 14);
-
-  matches = (window.realAppointments || []).filter(item => {
-    const appointment = new Date(item.appointment_at);
-
-    const appointmentDay = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Vancouver",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    }).formatToParts(appointment);
-
-    const parts = Object.fromEntries(
-      appointmentDay.map(part => [part.type, part.value])
-    );
-    const day = `${parts.year}-${parts.month}-${parts.day}`;
-
-    const categoryMatches = !category || item.category === category;
-
-    
-const distanceMatches =
-  searchRadius === Infinity ||
-  !customerCoordinates ||
-  (
-    Number.isFinite(item.latitude) &&
-    Number.isFinite(item.longitude) &&
-    distanceKm(
-      customerCoordinates.latitude,
-      customerCoordinates.longitude,
-      item.latitude,
-      item.longitude
-    ) <= searchRadius
-  ) ||
-  (
-    searchLocation &&
-    (
-      item.location?.trim().toLowerCase() === searchLocation.toLowerCase() ||
-      item.postal_code?.replace(/\s/g, "").toLowerCase() ===
-        searchLocation.replace(/\s/g, "").toLowerCase()
-    )
-  );
-
-
-    return day > selectedDate &&
-      day <= [
-        end.getFullYear(),
-        String(end.getMonth() + 1).padStart(2, "0"),
-        String(end.getDate()).padStart(2, "0")
-      ].join("-") &&
-      categoryMatches &&
-      distanceMatches;
-  }).sort((a, b) =>
-    new Date(a.appointment_at) - new Date(b.appointment_at)
-  );
-}
-
-    const results = document.getElementById("results");
-    results.replaceChildren();
-
-    const heading = document.createElement("h3");
-    heading.textContent =
-  selectedDate && matches.length > 0 &&
-  !matches.some(item => {
-    const parts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Vancouver",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    }).formatToParts(new Date(item.appointment_at));
-
-    const date = Object.fromEntries(
-      parts.map(part => [part.type, part.value])
-    );
-
-    return `${date.year}-${date.month}-${date.day}` === selectedDate;
-  })
-    ? "No openings on your selected date — here are other options in the next 14 days! 📅"
-    : "Available Appointments 🎉";
-    results.appendChild(heading);
-
-    if (matches.length === 0) {
-      const message = document.createElement("p");
-      message.textContent =
-        "No appointments match your search. Try another category or date.";
-      results.appendChild(message);
-    }
-
-    let visibleCount = 10;
-
-function displayOpenings() {
-  matches.slice(0, visibleCount).forEach(function(item) {
-      const card = document.createElement("div");
-      card.style.cssText =
-        "text-align:left;padding:14px 0;border-bottom:1px solid #ddd;";
-
-      const name = document.createElement("p");
-      const strong = document.createElement("strong");
-      strong.textContent = item.service_name;
-      name.appendChild(strong);
-      name.appendChild(document.createTextNode(" — " + item.business));
-
-      const details = document.createElement("p");
-      details.textContent =
-  item.location + " · " +
-  new Date(item.appointment_at).toLocaleString("en-CA", {
-    timeZone: "America/Vancouver",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit"
-  });
-const address = document.createElement("p");
-
-address.textContent = [
-  item.street_address,
-  item.location,
-  item.postal_code
-].filter(Boolean).join(", ");
-      const note = document.createElement("em");
-      note.textContent = "Contact the business to book this opening";
-      card.append(name, details, address, note);
-      const actionLinks = document.createElement("div");
-      actionLinks.className = "opening-actions";
-
-      function addAction(label, href, style, external = false) {
-        const link = document.createElement("a");
-        link.textContent = label;
-        link.href = href;
-        link.className = style;
-        if (external) {
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-        }
-        actionLinks.appendChild(link);
-      }
-
-      function safeWebsite(value) {
-        if (!value) return null;
-        try {
-          const url = new URL(value);
-          return ["https:", "http:"].includes(url.protocol) ? url.href : null;
-        } catch { return null; }
-      }
-
-      if (item.phone) addAction("Call to Book", "tel:" + item.phone, "call-action");
-      const booking = safeWebsite(item.booking_url);
-      if (booking) addAction("Book Online", booking, "booking-action", true);
-      const website = safeWebsite(item.website_url);
-      if (website) addAction("Visit Website", website, "website-action", true);
-      if (item.street_address) {
-        const fullAddress = [item.street_address, item.location, item.postal_code].filter(Boolean).join(", ");
-        addAction("Get Directions", "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(fullAddress), "directions-action", true);
-      }
-      if (actionLinks.children.length) card.appendChild(actionLinks);
-      results.appendChild(card);
-    });
-
-}
-
-displayOpenings();
-
-if (matches.length > 10) {
-  const moreButton = document.createElement("button");
-  moreButton.textContent = "Show 10 More Openings";
-  moreButton.style.cssText =
-    "display:block;margin:20px auto;padding:12px 24px;background:#00aeb5;color:white;border:none;border-radius:10px;font-weight:bold;cursor:pointer;";
-
-  moreButton.addEventListener("click", function() {
-    visibleCount += 10;
-    results.replaceChildren();
-    results.appendChild(heading);
-    displayOpenings();
-
-    if (visibleCount < matches.length) {
-      results.appendChild(moreButton);
-    }
-  });
-
-  results.appendChild(moreButton);
-}
-
-    document.getElementById("openings")
-      .scrollIntoView({ behavior: "smooth" });
-  });
-
-
-    document.getElementById("businessButton")
-  .addEventListener("click", function() {
-    window.location.href = "/business-signup.html";
-  });
-  </script>
+  </section>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const supabaseClient = window.supabase.createClient(
-    "https://zhgieqcdirxywwbyprlo.supabase.co",
-    "sb_publishable_brnqWUHE-F7TUx-6OcLgzw_Mk-aFOFy"
-  );
 
-  async function loadRealOpenings() {
-  const { data, error } = await supabaseClient
-    .from("appointment_openings")
-    .select("id, business_id, service_name, appointment_at, expires_at, status, booking_url, phone")
-    .eq("status", "available")
-    .gt("appointment_at", new Date().toISOString())
-.gt("expires_at", new Date().toISOString());
+function showDashboardView(view) {
+  const appointments = document.getElementById("appointmentsView");
+  const profile = document.getElementById("businessProfileView");
 
-  if (error) {
-    console.error("Error loading openings:", error);
-    alert("Supabase error: " + error.message);
+  if (view === "profile") {
+    appointments.classList.add("hidden");
+    profile.classList.remove("hidden");
+  } else {
+    profile.classList.add("hidden");
+    appointments.classList.remove("hidden");
+  }
+}
+const client = window.supabase.createClient(
+  "https://zhgieqcdirxywwbyprlo.supabase.co",
+  "sb_publishable_brnqWUHE-F7TUx-6OcLgzw_Mk-aFOFy"
+);
+
+const message = document.getElementById("message");
+const loginSection = document.getElementById("loginSection");
+const dashboardSection =
+  document.getElementById("dashboardSection");
+
+function showLogin(text) {
+  loginSection.classList.remove("hidden");
+  dashboardSection.classList.add("hidden");
+  message.textContent = text || "Please sign in.";
+}
+
+async function loadDashboard() {
+  const { data: userData, error: userError } =
+    await client.auth.getUser();
+
+  if (userError || !userData.user) {
+    showLogin("Please sign in to your business account.");
     return;
   }
 
-    
-const { data: directory, error: directoryError } =
-  await supabaseClient
-    .from("business_directory")
-    .select("business_id, business_name, category, street_address, city, postal_code, phone, booking_url, website_url, latitude, longitude");
+  const user = userData.user;
 
-if (directoryError) {
-  console.error("Error loading business directory:", directoryError);
+  const { data: profile, error } = await client
+    .from("business_profiles")
+    .select(
+      "business_name,email,city,street_address,province,postal_code,phone,website_url,booking_url,status,trial_ends_at"
+    )
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    message.textContent =
+      "Could not load business profile: " + error.message;
+    return;
+  }
+
+  if (!profile) {
+    message.textContent =
+      "No business profile found. Please contact support.";
+    return;
+  }
+if (profile.status !== "approved") {
+  showLogin("Your business account is pending approval. You will be able to access your dashboard once approved.");
   return;
 }
-  console.log("Real appointment openings:", data);
-    window.realAppointments = (data || [])
-  .map(item => {
-    const business = (directory || []).find(
-      entry => entry.business_id === item.business_id
-    );
+  loginSection.classList.add("hidden");
+  dashboardSection.classList.remove("hidden");
+  message.textContent = "";
 
-    if (!business) {
-  alert("Appointment has no matching business directory entry. Business ID: " + item.business_id);
-  return null;
+  document.getElementById("welcome").textContent =
+    "Welcome, " + profile.business_name + "!";
+
+  document.getElementById("businessEmail").textContent =
+    profile.email;
+
+  document.getElementById("accountStatus").textContent =
+    profile.status === "approved"
+      ? "Approved"
+      : profile.status === "rejected"
+      ? "Not approved"
+      : "Pending Approval";
+
+  document.getElementById("businessName").textContent =
+    profile.business_name;
+
+  document.getElementById("businessCity").textContent =
+    profile.city || "Not added yet";
+document.getElementById("businessStreetAddress").textContent =
+  profile.street_address || "Not added yet";
+  document.getElementById("businessProvince").textContent = profile.province || "Not added yet";
+  document.getElementById("businessPostalCode").textContent = profile.postal_code || "Not added yet";
+  document.getElementById("businessPhone").textContent =
+  profile.phone
+    ? profile.phone.replace(/\D/g, "").replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3")
+    : "Not added yet";
+
+  document.getElementById("websiteUrl").textContent =
+    profile.website_url || "Not added yet";
+
+  document.getElementById("bookingUrl").textContent =
+    profile.booking_url || "Not added yet";
+
+  document.getElementById("trialMessage").textContent =
+    profile.trial_ends_at
+      ? "Free trial ends: " +
+        new Date(profile.trial_ends_at).toLocaleDateString()
+      : "Your free trial has not started yet.";
 }
 
-    return {
-      ...item,
-      business: business.business_name,
-      category: business.category,
-      location: business.city,
-      street_address: business.street_address,
-      postal_code: business.postal_code,
-      latitude: business.latitude == null ? null : Number(business.latitude),
-longitude: business.longitude == null ? null : Number(business.longitude),
-      booking_url: business.booking_url,
-      website_url: business.website_url,
-      phone: item.phone || business.phone
-    };
-  })
-  .filter(Boolean);
-}
+document.getElementById("openingForm")
+  .addEventListener("submit", async function(event) {
+    event.preventDefault();
 
-window.openingsReady = loadRealOpenings();
+    const output = document.getElementById("openingMessage");
+    output.textContent = "Saving your opening...";
+
+    try {
+      const { data: { user }, error: userError } =
+        await client.auth.getUser();
+
+      if (userError || !user) {
+        throw new Error("Please sign in again.");
+      }
+
+      const { data: profile, error: profileError } = await client
+        .from("business_profiles")
+        .select("status")
+        .eq("owner_id", user.id)
+        .single();
+
+      if (profileError || profile?.status !== "approved") {
+        throw new Error("Your business must be approved first.");
+      }
+
+      const { data: business, error: businessError } = await client
+        .from("businesses")
+        .select("id")
+        .eq("owner_id", user.id)
+        .single();
+
+      if (businessError || !business) {
+        throw new Error("Your business record could not be found.");
+      }
+
+      const serviceName =
+        document.getElementById("serviceName").value.trim();
+
+      const dateValue =
+        document.getElementById("appointmentDate").value;
+
+      const appointmentDate = new Date(dateValue);
+
+      if (!serviceName || !dateValue ||
+          isNaN(appointmentDate.getTime()) ||
+          appointmentDate <= new Date()) {
+        throw new Error("Please enter a future appointment date and time.");
+      }
+
+      const description =
+        document.getElementById("openingDescription").value.trim();
+const category = document.getElementById("openingCategory").value;
+      const { error: insertError } = await client
+        .from("appointment_openings")
+        .insert({
+          business_id: business.id,
+          service_name: serviceName,
+          category: category,
+          description: description || null,
+          appointment_at: appointmentDate.toISOString(),
+          expires_at: appointmentDate.toISOString(),
+          status: event.submitter?.value === "publish" ? "available" : "draft"
+        });
+
+      if (insertError) throw insertError;
+
+      output.textContent = event.submitter?.value === "publish"
+  ? "Opening published successfully!"
+  : "Opening saved as draft successfully!";
+      event.target.reset();
+await loadMyOpenings();
+    } catch (error) {
+      output.textContent = "Save error: " + error.message;
+    }
+  });
+
+document.getElementById("loginForm")
+  .addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    message.textContent = "Signing in...";
+
+    const email = document.getElementById("email").value;
+    const password =
+      document.getElementById("password").value;
+
+    const { error } =
+      await client.auth.signInWithPassword({
+        email,
+        password
+      });
+
+    if (error) {
+      showLogin("Sign-in error: " + error.message);
+      return;
+    }
+
+    await loadDashboard();
+  });
+// Fill the business edit form with saved information
+async function fillBusinessEditForm() {
+  const { data: { user } } = await client.auth.getUser();
+  if (!user) return;
+
+  const { data: profile, error } = await client
+    .from("business_profiles")
+    
+.select("business_name,city,street_address,province,postal_code,phone,website_url,booking_url")
+
+    .eq("owner_id", user.id)
+    .single();
+
+  if (error || !profile) return;
+
+  document.getElementById("editBusinessName").value =
+    profile.business_name || "";
+  document.getElementById("editCity").value =
+    profile.city || "";
   
-  console.log("Squeeze Me In: Supabase connected");
+document.getElementById("editStreetAddress").value = profile.street_address || "";
+
+  document.getElementById("editProvince").value = profile.province || "";
+  document.getElementById("editPostalCode").value = profile.postal_code || "";
+  document.getElementById("editPhone").value =
+  (profile.phone || "")
+    .replace(/\D/g, "")
+    .replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3");
+  document.getElementById("editWebsiteUrl").value = profile.website_url || "";
+  document.getElementById("editBookingUrl").value =
+    profile.booking_url || "";
+}
+
+function optionalWebUrl(id) {
+  const field = document.getElementById(id);
+  const value = field.value.trim();
+  if (!value) return null;
+  let url;
+  try { url = new URL(value); } catch { throw new Error("Please enter a valid website URL starting with https:// or http://."); }
+  if (!["https:", "http:"].includes(url.protocol) || !url.hostname || url.username || url.password) {
+    throw new Error("Please enter a valid website URL starting with https:// or http://.");
+  }
+  return url.href;
+}
+
+// Save changes to Supabase
+document.getElementById("businessEditForm")
+  .addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const editMessage = document.getElementById("editMessage");
+    const saveButton = this.querySelector('button[type="submit"]');
+
+    saveButton.disabled = true;
+    editMessage.textContent = "Saving your information...";
+
+    try {
+      const { data: { user }, error: authError } =
+        await client.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error("Please sign in again.");
+      }
+
+      const { error } = await client
+        .from("business_profiles")
+        .update({
+          business_name:
+            document.getElementById("editBusinessName").value.trim(),
+          city:
+            document.getElementById("editCity").value.trim() || null,
+          street_address:
+  document.getElementById("editStreetAddress").value.trim() || null,
+
+          province: document.getElementById("editProvince").value || null,
+          postal_code: document.getElementById("editPostalCode").value.trim().toUpperCase().replace(/\s/g, "") || null,
+          phone:
+            document.getElementById("editPhone").value.trim() || null,
+          website_url: optionalWebUrl("editWebsiteUrl"),
+          booking_url: optionalWebUrl("editBookingUrl")
+        })
+        .eq("owner_id", user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      editMessage.textContent = "Business information saved successfully!";
+      await loadDashboard();
+
+    } catch (error) {
+      editMessage.textContent = "Save error: " + error.message;
+    } finally {
+      saveButton.disabled = false;
+    }
+  });
+
+// Populate the form after the dashboard loads
+const originalLoadDashboard = loadDashboard;
+
+loadDashboard = async function() {
+  await originalLoadDashboard();
+
+  if (!dashboardSection.classList.contains("hidden")) {
+    await fillBusinessEditForm();
+  }
+};
+document.getElementById("signOutButton")
+  .addEventListener("click", async function() {
+    await client.auth.signOut();
+    showLogin("You have signed out.");
+  });
+
+async function loadMyOpenings() {
+  const container = document.getElementById("myOpenings");
+  if (!container) return;
+
+  container.textContent = "Loading your appointments...";
+
+  const { data: { user }, error: userError } =
+    await client.auth.getUser();
+
+  if (userError || !user) {
+    container.textContent = "Please sign in.";
+    return;
+  }
+
+  const { data: business, error: businessError } = await client
+    .from("businesses")
+    .select("id")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (businessError || !business) {
+    container.textContent = "No business record found.";
+    return;
+  }
+
+  const { data: openings, error } = await client
+    .from("appointment_openings")
+    .select("id,service_name,category,appointment_at,status,description")
+    .eq("business_id", business.id)
+   .gt("appointment_at", new Date().toISOString())
+    .order("appointment_at", { ascending: true });
+
+  if (error) {
+    container.textContent = "Unable to load appointments: " + error.message;
+    return;
+  }
+
+  if (!openings || openings.length === 0) {
+    container.textContent = "You have no saved appointments yet.";
+    return;
+  }
+
+  container.replaceChildren();
+
+  openings.forEach(opening => {
+    const card = document.createElement("div");
+    card.style.cssText =
+      "border:1px solid #ddd;border-radius:10px;padding:15px;margin:12px 0;";
+
+    const name = document.createElement("strong");
+    name.textContent = opening.service_name;
+
+    const details = document.createElement("p");
+    details.textContent =
+      new Date(opening.appointment_at).toLocaleString("en-CA", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+
+    const status = document.createElement("p");
+    status.textContent = "Status: " + opening.status;
+
+    card.append(name, details, status);
+
+    if (opening.description) {
+      const description = document.createElement("p");
+      description.textContent = opening.description;
+      card.append(description);
+    }
+
+const deleteButton = document.createElement("button");
+deleteButton.type = "button";
+deleteButton.textContent = "Delete";
+deleteButton.style.cssText =
+  "background:#dc3545;color:white;padding:10px 18px;margin-top:10px;border:0;border-radius:8px;";
+
+deleteButton.addEventListener("click", async () => {
+  if (!confirm("Permanently delete this appointment opening?")) return;
+
+  const { error } = await client
+    .from("appointment_openings")
+    .delete()
+    .eq("id", opening.id);
+
+  if (error) {
+    alert("Delete failed: " + error.message);
+    return;
+  }
+
+  await loadMyOpenings();
+});
+
+const editButton = document.createElement("button");
+editButton.type = "button";
+editButton.textContent = "Edit";
+editButton.style.cssText =
+  "background:#00B3B8;color:white;padding:10px 18px;margin:10px 10px 0 0;border:0;border-radius:8px;";
+
+
+editButton.addEventListener("click", () => {
+  const panel = document.getElementById("editOpeningPanel");
+
+  document.getElementById("editOpeningService").value =
+    opening.service_name || "";
+document.getElementById("editOpeningCategory").value =
+  opening.category || "";
+  const date = new Date(opening.appointment_at);
+  const localDate = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000
+  );
+
+  document.getElementById("editOpeningDate").value =
+    localDate.toISOString().slice(0, 16);
+
+  document.getElementById("editOpeningDescription").value =
+    opening.description || "";
+
+  document.getElementById("editOpeningMessage").textContent = "";
+
+  panel.dataset.openingId = opening.id;
+  panel.classList.remove("hidden");
+
+  panel.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+
+const publishButton = document.createElement("button");
+publishButton.type = "button";
+publishButton.textContent = "Publish";
+publishButton.style.cssText =
+  "background:#00B3B8;color:white;padding:10px 18px;margin:10px 10px 0 0;border:0;border-radius:8px;cursor:pointer;";
+
+publishButton.addEventListener("click", async () => {
+  if (new Date(opening.appointment_at) <= new Date()) {
+  alert("You cannot publish an appointment in the past. Please edit the date and time first.");
+  return;
+}
+  if (!confirm("Publish this appointment for customers to see?")) return;
+
+  const { error } = await client
+    .from("appointment_openings")
+    .update({ status: "available" })
+    .eq("id", opening.id);
+
+  if (error) {
+    alert("Unable to publish: " + error.message);
+    return;
+  }
+
+  alert("Appointment published successfully!");
+  await loadMyOpenings();
+});
+
+if (opening.status === "draft") {
+  card.append(publishButton);
+}
+
+card.append(editButton);
+
+card.append(deleteButton);
+
+    container.append(card);
+  });
+}
+
+const previousLoadDashboard = loadDashboard;
+
+loadDashboard = async function() {
+  await previousLoadDashboard();
+
+  if (!dashboardSection.classList.contains("hidden")) {
+    await loadMyOpenings();
+  }
+};
+
+document.getElementById("cancelOpeningEdit")
+  .addEventListener("click", () => {
+    document.getElementById("editOpeningPanel").classList.add("hidden");
+  });
+
+document.getElementById("editOpeningForm")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const panel = document.getElementById("editOpeningPanel");
+    const message = document.getElementById("editOpeningMessage");
+    const openingId = panel.dataset.openingId;
+
+    const service = document.getElementById("editOpeningService").value.trim();
+    const dateValue = document.getElementById("editOpeningDate").value;
+    const description = document.getElementById("editOpeningDescription").value.trim();
+const category = document.getElementById("editOpeningCategory").value;
+    if (!openingId || !service || !dateValue || !category) {
+      message.textContent = "Please complete all required fields.";
+      return;
+    }
+
+    const appointmentDate = new Date(dateValue);
+
+    if (Number.isNaN(appointmentDate.getTime()) || appointmentDate <= new Date()) {
+      message.textContent = "Please enter a future date and time.";
+      return;
+    }
+
+    message.textContent = "Saving changes...";
+
+    const { data: { user }, error: userError } = await client.auth.getUser();
+
+    if (userError || !user) {
+      message.textContent = "Please sign in again.";
+      return;
+    }
+
+    const { data: business, error: businessError } = await client
+      .from("businesses")
+      .select("id")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+
+    if (businessError || !business) {
+      message.textContent = "Unable to verify your business.";
+      return;
+    }
+
+    const { data, error } = await client
+      .from("appointment_openings")
+      .update({
+        service_name: service,
+        category: category,
+        appointment_at: appointmentDate.toISOString(),
+        expires_at: appointmentDate.toISOString(),
+        description: description
+      })
+      .eq("id", openingId)
+      .eq("business_id", business.id)
+      .select("id");
+
+    if (error) {
+      message.textContent = "Unable to save changes: " + error.message;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      message.textContent = "Appointment not found or update not permitted.";
+      return;
+    }
+
+    panel.classList.add("hidden");
+    await loadMyOpenings();
+  });
+
+loadDashboard();
 </script>
 
 </body>
