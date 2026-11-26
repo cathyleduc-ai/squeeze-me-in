@@ -140,7 +140,10 @@ button:disabled { opacity: .6; }
       <p><strong>Phone:</strong>
         <span id="businessPhone"></span>
       </p>
-      <p><strong>Booking website:</strong>
+      <p><strong>Business website:</strong>
+        <span id="websiteUrl"></span>
+      </p>
+      <p><strong>Online booking website:</strong>
         <span id="bookingUrl"></span>
       </p>
     </div>
@@ -164,7 +167,10 @@ button:disabled { opacity: .6; }
     <label for="editPhone">Business phone</label>
     <input id="editPhone" type="tel" inputmode="numeric" maxlength="12" placeholder="604-555-0100" oninput="let n=this.value.replace(/\D/g,'').slice(0,10);this.value=n.length>6?n.slice(0,3)+'-'+n.slice(3,6)+'-'+n.slice(6):n.length>3?n.slice(0,3)+'-'+n.slice(3):n">
 
-    <label for="editBookingUrl">Booking website</label>
+    <label for="editWebsiteUrl">Business website (optional)</label>
+    <input id="editWebsiteUrl" type="url" placeholder="https://yourbusiness.com">
+
+    <label for="editBookingUrl">Online booking website (optional)</label>
     <input id="editBookingUrl" type="url"
       placeholder="https://yourbookingwebsite.com">
 
@@ -323,7 +329,7 @@ async function loadDashboard() {
   const { data: profile, error } = await client
     .from("business_profiles")
     .select(
-      "business_name,email,city,street_address,province,postal_code,phone,booking_url,status,trial_ends_at"
+      "business_name,email,city,street_address,province,postal_code,phone,website_url,booking_url,status,trial_ends_at"
     )
     .eq("owner_id", user.id)
     .maybeSingle();
@@ -373,6 +379,9 @@ document.getElementById("businessStreetAddress").textContent =
   profile.phone
     ? profile.phone.replace(/\D/g, "").replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3")
     : "Not added yet";
+
+  document.getElementById("websiteUrl").textContent =
+    profile.website_url || "Not added yet";
 
   document.getElementById("bookingUrl").textContent =
     profile.booking_url || "Not added yet";
@@ -491,7 +500,7 @@ async function fillBusinessEditForm() {
   const { data: profile, error } = await client
     .from("business_profiles")
     
-.select("business_name,city,street_address,province,postal_code,phone,booking_url")
+.select("business_name,city,street_address,province,postal_code,phone,website_url,booking_url")
 
     .eq("owner_id", user.id)
     .single();
@@ -511,8 +520,21 @@ document.getElementById("editStreetAddress").value = profile.street_address || "
   (profile.phone || "")
     .replace(/\D/g, "")
     .replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3");
+  document.getElementById("editWebsiteUrl").value = profile.website_url || "";
   document.getElementById("editBookingUrl").value =
     profile.booking_url || "";
+}
+
+function optionalWebUrl(id) {
+  const field = document.getElementById(id);
+  const value = field.value.trim();
+  if (!value) return null;
+  let url;
+  try { url = new URL(value); } catch { throw new Error("Please enter a valid website URL starting with https:// or http://."); }
+  if (!["https:", "http:"].includes(url.protocol) || !url.hostname || url.username || url.password) {
+    throw new Error("Please enter a valid website URL starting with https:// or http://.");
+  }
+  return url.href;
 }
 
 // Save changes to Supabase
@@ -548,8 +570,8 @@ document.getElementById("businessEditForm")
           postal_code: document.getElementById("editPostalCode").value.trim().toUpperCase().replace(/\s/g, "") || null,
           phone:
             document.getElementById("editPhone").value.trim() || null,
-          booking_url:
-            document.getElementById("editBookingUrl").value.trim() || null
+          website_url: optionalWebUrl("editWebsiteUrl"),
+          booking_url: optionalWebUrl("editBookingUrl")
         })
         .eq("owner_id", user.id)
         .select()
