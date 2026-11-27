@@ -274,7 +274,17 @@ button:disabled { opacity: .6; }
 <div id="myOpenings" aria-live="polite">
   Loading your appointments...
 </div>
-
+<section aria-labelledby="activityHeading" style="margin-top:30px;border-top:1px solid #ddd;padding-top:15px;">
+  <h2 id="activityHeading">Your Business Activity</h2>
+  <div id="activityStats" aria-live="polite" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+    <div style="border:1px solid #ddd;border-radius:12px;padding:12px;text-align:center;"><strong id="stat-posted" style="display:block;font-size:28px;color:#008B95;">—</strong>Openings posted</div>
+    <div style="border:1px solid #ddd;border-radius:12px;padding:12px;text-align:center;"><strong id="stat-filled" style="display:block;font-size:28px;color:#169447;">—</strong>Openings filled</div>
+    <div style="border:1px solid #ddd;border-radius:12px;padding:12px;text-align:center;"><strong id="stat-available" style="display:block;font-size:28px;color:#B45309;">—</strong>Currently available</div>
+    <div style="border:1px solid #ddd;border-radius:12px;padding:12px;text-align:center;"><strong id="stat-expired" style="display:block;font-size:28px;color:#64748B;">—</strong>Expired unfilled</div>
+  </div>
+  <p id="activityMessage" role="status" style="font-size:14px;"></p>
+  <p style="font-size:13px;color:#64748b;">Based on retained available and filled openings. Drafts, cancelled and deleted openings are excluded. Filled counts are reported by your business.</p>
+</section>
     </div>
 
     <button id="signOutButton" class="secondary">
@@ -602,13 +612,49 @@ loadDashboard = async function() {
 document.getElementById("signOutButton")
   .addEventListener("click", async function() {
     await client.auth.signOut();
+    clearActivity();
     showLogin("You have signed out.");
   });
 
+let activityRequest = 0;
+function clearActivity() {
+  activityRequest++;
+  for (const key of ["posted", "filled", "available", "expired"]) {
+    document.getElementById("stat-" + key).textContent = "—";
+  }
+  document.getElementById("activityMessage").textContent = "";
+}
+async function loadBusinessActivity(businessId) {
+  clearActivity();
+  const request = activityRequest;
+  const output = document.getElementById("activityMessage");
+  output.textContent = "Loading activity...";
+  const now = new Date().toISOString();
+  const base = () => client.from("appointment_openings")
+    .select("id", { count: "exact", head: true })
+    .eq("business_id", businessId);
+  try {
+    const results = await Promise.all([
+      base().in("status", ["available", "filled"]),
+      base().eq("status", "filled"),
+      base().eq("status", "available").gt("appointment_at", now).gt("expires_at", now),
+      base().eq("status", "available").or(`appointment_at.lte.${now},expires_at.lte.${now}`)
+    ]);
+    if (request !== activityRequest) return;
+    if (results.some(r => r.error || r.count === null)) throw new Error("Count unavailable");
+    ["posted", "filled", "available", "expired"].forEach((key, i) => {
+      document.getElementById("stat-" + key).textContent = results[i].count;
+    });
+    output.textContent = "";
+  } catch (error) {
+    if (request === activityRequest) output.textContent = "Unable to load activity. Refresh the page to try again.";
+  }
+}
 async function loadMyOpenings() {
   const container = document.getElementById("myOpenings");
   if (!container) return;
 
+  clearActivity();
   container.textContent = "Loading your appointments...";
 
   const { data: { user }, error: userError } =
@@ -629,6 +675,8 @@ async function loadMyOpenings() {
     container.textContent = "No business record found.";
     return;
   }
+
+  await loadBusinessActivity(business.id);
 
   const { data: openings, error } = await client
     .from("appointment_openings")
