@@ -180,7 +180,14 @@ button:disabled { opacity: .6; }
   <p id="editMessage" role="status"></p>
 </div>
     </div>  
-    <div id="appointmentsView" class="card">
+    <section id="subscriptionCard" class="card" aria-live="polite">
+  <h2 id="subscriptionTitle">Checking subscription...</h2>
+  <p id="subscriptionDetail"></p>
+  <p id="subscriptionDate"></p>
+  <progress id="trialProgress" class="hidden" max="100" value="0" style="width:100%;accent-color:#00B3B8;"></progress>
+  <p id="subscriptionOffer" class="hidden">$20 CAD/month or $220 CAD/year. No automatic charges. Payment options coming soon.</p>
+</section>
+<div id="appointmentsView" class="card">
       <h2>Appointment Openings</h2>
       
 <form id="openingForm">
@@ -276,7 +283,7 @@ button:disabled { opacity: .6; }
   <div id="activityStats" aria-live="polite" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
     <div style="border:1px solid #ddd;border-radius:12px;padding:12px;text-align:center;"><strong id="stat-posted" style="display:block;font-size:28px;color:#008B95;">—</strong>Openings posted</div>
     <div style="border:1px solid #ddd;border-radius:12px;padding:12px;text-align:center;"><strong id="stat-filled" style="display:block;font-size:28px;color:#169447;">—</strong>Openings filled</div>
-    <div style="border:1px solid #ddd;border-radius:12px;padding:12px;text-align:center;"><strong id="stat-available" style="display:block;font-size:28px;color:#B45309;">—</strong>Currently available</div>
+    <div style="border:1px solid #ddd;border-radius:12px;padding:12px;text-align:center;"><strong id="stat-available" style="display:block;font-size:28px;color:#B45309;">—</strong><span id="availabilityLabel">Saved upcoming openings</span></div>
     <div style="border:1px solid #ddd;border-radius:12px;padding:12px;text-align:center;"><strong id="stat-expired" style="display:block;font-size:28px;color:#64748B;">—</strong>Expired unfilled</div>
   </div>
   <p id="activityMessage" role="status" style="font-size:14px;"></p>
@@ -294,6 +301,67 @@ button:disabled { opacity: .6; }
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 
+let subscriptionRequest = 0;
+const expiryMessage = "Your subscription is not active. You can save drafts, but publishing requires an active trial or subscription.";
+async function checkPublishing(businessId) {
+  const {data,error} = await client.rpc("is_business_eligible", {check_business_id:businessId});
+  if(error) throw new Error("Unable to verify subscription. Please try again.");
+  if(data !== true) throw new Error(expiryMessage);
+}
+async function loadSubscription(businessId) {
+  const request = ++subscriptionRequest;
+  const title = document.getElementById("subscriptionTitle");
+  const detail = document.getElementById("subscriptionDetail");
+  const date = document.getElementById("subscriptionDate");
+  const progress = document.getElementById("trialProgress");
+  const offer = document.getElementById("subscriptionOffer");
+  title.textContent = "Checking subscription...";
+  detail.textContent = date.textContent = "";
+  progress.classList.add("hidden"); offer.classList.add("hidden");
+  try {
+    const [e,p,v] = await Promise.all([
+      client.from("business_eligibility").select("approval_status,approved_at,trial_ends_at").eq("business_id",businessId).single(),
+      client.from("business_subscriptions").select("plan_type,starts_at,ends_at,paid_at,status").eq("business_id",businessId).eq("status","paid").not("paid_at","is",null),
+      client.rpc("is_business_eligible",{check_business_id:businessId})
+    ]);
+    if(request !== subscriptionRequest) return;
+    if(e.error || p.error || v.error) throw new Error("Unavailable");
+    const now = Date.now(), trial = Date.parse(e.data.trial_ends_at), start = Date.parse(e.data.approved_at);
+    const paid = (p.data || []).filter(x=>Date.parse(x.starts_at)<=now && Date.parse(x.ends_at)>now).sort((a,b)=>Date.parse(b.ends_at)-Date.parse(a.ends_at))[0];
+    const activeTrial = start<=now && trial>now;
+    const days = end=>Math.max(0,Math.ceil((end-now)/86400000));
+    const format = end=>new Date(end).toLocaleDateString("en-CA",{dateStyle:"long"});
+    if(v.data !== true) {
+      title.textContent = "Your subscription is not active";
+      detail.textContent = "Your openings are hidden from customers. Your drafts and business history are retained.";
+      offer.classList.remove("hidden");
+    } else if(activeTrial && (!paid || trial>=Date.parse(paid.ends_at))) {
+      title.textContent = "Your free trial is active";
+      detail.textContent = days(trial)+" days remaining · Unlimited appointment listings";
+      date.textContent = "Free trial ends: "+format(trial);
+      progress.value = Math.max(0,Math.min(100,100*(trial-now)/(trial-start)));
+      progress.classList.remove("hidden");
+      if(days(trial)<=10) offer.classList.remove("hidden");
+    } else if(paid) {
+      const end = Date.parse(paid.ends_at);
+      title.textContent = (paid.plan_type === "annual" ? "Annual" : "Monthly")+" subscription active";
+      detail.textContent = days(end)+" days remaining";
+      date.textContent = "Current paid period ends: "+format(end);
+      if(days(end)<=(paid.plan_type === "annual" ? 30 : 7)) offer.classList.remove("hidden");
+    } else {
+      title.textContent = "Your account is eligible";
+      detail.textContent = "Subscription dates could not be displayed. Please refresh.";
+    }
+    document.getElementById("trialMessage").textContent = date.textContent || title.textContent;
+    document.getElementById("availabilityLabel").textContent = v.data === true ? "Currently available" : "Saved upcoming openings (hidden)";
+  } catch(error) {
+    if(request !== subscriptionRequest) return;
+    title.textContent = "Subscription information unavailable";
+    detail.textContent = "Refresh the page to try again.";
+    document.getElementById("trialMessage").textContent = title.textContent;
+    document.getElementById("availabilityLabel").textContent = "Saved upcoming openings";
+  }
+}
 function showDashboardView(view) {
   const appointments = document.getElementById("appointmentsView");
   const profile = document.getElementById("businessProfileView");
@@ -393,11 +461,7 @@ document.getElementById("businessStreetAddress").textContent =
   document.getElementById("bookingUrl").textContent =
     profile.booking_url || "Not added yet";
 
-  document.getElementById("trialMessage").textContent =
-    profile.trial_ends_at
-      ? "Free trial ends: " +
-        new Date(profile.trial_ends_at).toLocaleDateString()
-      : "Your free trial has not started yet.";
+  document.getElementById("trialMessage").textContent = "Checking subscription...";
 }
 
 document.getElementById("openingForm")
@@ -452,6 +516,7 @@ document.getElementById("openingForm")
       const description =
         document.getElementById("openingDescription").value.trim();
 const category = document.getElementById("openingCategory").value;
+      if (event.submitter?.value === "publish") await checkPublishing(business.id);
       const { error: insertError } = await client
         .from("appointment_openings")
         .insert({
@@ -609,6 +674,7 @@ loadDashboard = async function() {
 document.getElementById("signOutButton")
   .addEventListener("click", async function() {
     await client.auth.signOut();
+    subscriptionRequest++;
     clearActivity();
     showLogin("You have signed out.");
   });
@@ -673,6 +739,7 @@ async function loadMyOpenings() {
     return;
   }
 
+  await loadSubscription(business.id);
   await loadBusinessActivity(business.id);
 
   const { data: openings, error } = await client
@@ -771,6 +838,7 @@ document.getElementById("editOpeningCategory").value =
   document.getElementById("editOpeningMessage").textContent = "";
 
   panel.dataset.openingId = opening.id;
+  panel.dataset.openingStatus = opening.status;
   panel.classList.remove("hidden");
 
   panel.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -788,6 +856,7 @@ publishButton.addEventListener("click", async () => {
   alert("You cannot publish an appointment in the past. Please edit the date and time first.");
   return;
 }
+  try { await checkPublishing(business.id); } catch(error) { alert(error.message); return; }
   if (!confirm("Publish this appointment for customers to see?")) return;
 
   const { error } = await client
@@ -912,6 +981,9 @@ const category = document.getElementById("editOpeningCategory").value;
       return;
     }
 
+    if(panel.dataset.openingStatus === "available") {
+      try { await checkPublishing(business.id); } catch(error) { message.textContent = error.message; return; }
+    }
     const { data, error } = await client
       .from("appointment_openings")
       .update({
