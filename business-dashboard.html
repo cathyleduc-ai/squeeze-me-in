@@ -634,7 +634,8 @@ async function loadMyOpenings() {
     .from("appointment_openings")
     .select("id,service_name,category,appointment_at,status,description")
     .eq("business_id", business.id)
-   .gt("appointment_at", new Date().toISOString())
+   .in("status", ["draft", "available"])
+    .gt("appointment_at", new Date().toISOString())
     .order("appointment_at", { ascending: true });
 
   if (error) {
@@ -760,6 +761,43 @@ publishButton.addEventListener("click", async () => {
 
 if (opening.status === "draft") {
   card.append(publishButton);
+}
+
+if (opening.status === "available") {
+  const filledButton = document.createElement("button");
+  filledButton.type = "button";
+  filledButton.textContent = "✓ Mark as Filled";
+  filledButton.style.cssText =
+    "display:block;width:100%;background:#169447;color:white;padding:12px 18px;margin:10px 0;border:0;border-radius:8px;";
+
+  filledButton.addEventListener("click", async () => {
+    filledButton.disabled = true;
+    try {
+      const { data, error } = await client
+        .from("appointment_openings")
+        .update({ status: "filled" })
+        .eq("id", opening.id)
+        .eq("business_id", business.id)
+        .eq("status", "available")
+        .select("id");
+      if (error) throw error;
+      if (!data || data.length !== 1) {
+        throw new Error("Opening is no longer available or update not permitted.");
+      }
+      const panel = document.getElementById("editOpeningPanel");
+      if (panel.dataset.openingId === String(opening.id)) {
+        panel.classList.add("hidden");
+        delete panel.dataset.openingId;
+      }
+      document.getElementById("openingMessage").textContent = "Appointment marked as filled!";
+      await loadMyOpenings();
+    } catch (error) {
+      alert("Unable to mark as filled: " + error.message);
+    } finally {
+      filledButton.disabled = false;
+    }
+  });
+  card.append(filledButton);
 }
 
 card.append(editButton);
